@@ -1,0 +1,6 @@
+*.3dsx
+*.elf
+*.bat
+*.lnk
+*.cia
+build/*
