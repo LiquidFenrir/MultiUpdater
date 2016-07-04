@@ -1,0 +1,15 @@
+{
+	"entries": [
+		{
+			"name": "Luma3DS",
+			"url": "http://luma3ds.ericchu.net/latest/",
+			"path": "/arm9loaderhax.bin"
+		},
+		{
+			"name": "Decrypt9WIP",
+			"url": "https://d0k3.secretalgorithm.com/latest/Decrypt9WIP",
+			"inzip": "Decrypt9WIP.bin",
+			"path": "/luma/payloads/up_D9.bin"
+		}
+	]
+}

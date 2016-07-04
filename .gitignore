@@ -1,3 +1,9 @@
+*.smdh
+*.bin
+*.bnr
+*.icn
+*.icon
+*.rsf
 *.3dsx
 *.elf
 *.bat

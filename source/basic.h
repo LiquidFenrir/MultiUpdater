@@ -4,7 +4,7 @@
 #include <math.h>
 #include <3ds.h>
 
-#define WORKING_DIR "3ds/mupdtr/"
+#define WORKING_DIR "/3ds/mupdtr/"
 
 #define ERROR_NONE 42
 
