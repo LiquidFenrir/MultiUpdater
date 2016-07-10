@@ -6,10 +6,22 @@
 			"path": "/arm9loaderhax.bin"
 		},
 		{
+			"name": "Hourglass9",
+			"url": "https://d0k3.secretalgorithm.com/latest/Hourglass9",
+			"inzip": "Hourglass9.bin",
+			"path": "/luma/payloads/start_Hourglass9.bin"
+		},
+		{
 			"name": "Decrypt9WIP",
 			"url": "https://d0k3.secretalgorithm.com/latest/Decrypt9WIP",
 			"inzip": "Decrypt9WIP.bin",
-			"path": "/luma/payloads/up_D9.bin"
+			"path": "/luma/payloads/x_Decrypt9WIP.bin"
+		},
+		{
+			"name": "EmuNAND9",
+			"url": "https://d0k3.secretalgorithm.com/latest/EmuNAND9",
+			"inzip": "EmuNAND9.bin",
+			"path": "/luma/payloads/y_EmuNAND9.bin"
 		}
 	]
 }

@@ -29,7 +29,7 @@ include $(DEVKITARM)/3ds_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir mupdtr)
 BUILD		:=	build
-SOURCES		:=	source
+SOURCES		:=	source source/minizip
 DATA		:=	data
 # INCLUDES	:=	
 NO_SMDH		:= true
@@ -52,7 +52,7 @@ CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
+LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-z,defs,-Map,$(notdir $*.map)
 
 LIBS	:= -lz -ljansson -lctru -lm
 
@@ -171,6 +171,12 @@ $(OUTPUT).elf	:	$(OFILES)
 
 #---------------------------------------------------------------------------------
 %.ttf.o	:	%.ttf
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
+	
+#---------------------------------------------------------------------------------
+%.der.o	:	%.der
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)

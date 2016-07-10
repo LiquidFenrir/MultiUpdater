@@ -1,9 +1,7 @@
 #include "download.h"
-#include <inttypes.h>
 
-Result downloadToFile(const char *url, const char *filepath)
+Result downloadToFile(const char * url, const char * filepath)
 {
-	
 	printf("downloading file from:\n%s\nto:\n%s\n", url, filepath);
 	
 	httpcContext context;
@@ -15,36 +13,65 @@ Result downloadToFile(const char *url, const char *filepath)
 	ret = httpcOpenContext(&context, HTTPC_METHOD_GET, url, 0);
 	if (ret != 0)
 	{
-		printf("error in:\nhttpcOpenContext:\nreturn: %"PRId32"\n", ret);
+		printf("error in:\nhttpcOpenContext:\nreturn: %lx\n", ret);
+		return ret;
+	}
+	
+	ret = httpcAddRequestHeaderField(&context, "User-Agent", "MultiUpdater");
+	if (ret != 0)
+	{
+		printf("error in:\nhttpcAddRequestHeaderField\nreturn: %lx\n", ret);
+		return ret;
+	}
+	
+	ret = httpcSetSSLOpt(&context, 1<<9);
+	if (ret != 0)
+	{
+		printf("error in:\nhttpcSetSSLOpt\nreturn: %lx\n", ret);
 		return ret;
 	}
 	
 	ret = httpcBeginRequest(&context);
 	if(ret != 0)
 	{
-		printf("error in:\nhttpcBeginRequest\nreturn: %"PRId32"\n", ret);
+		printf("error in:\nhttpcBeginRequest\nreturn: %lx\n", ret);
 		return ret;
 	}
 	
 	ret = httpcGetResponseStatusCode(&context, &statuscode, 0);
 	if (ret != 0)
 	{
-		printf("error in:\nhttpcGetResponseStatusCode\nreturn: %"PRId32"\n", ret);
+		printf("error in:\nhttpcGetResponseStatusCode\nreturn: %lx\n", ret);
 		httpcCloseContext(&context);
 		return ret;
 	}
 	
 	if (statuscode != 200)
 	{
-		printf("error: status code not 200.\nStatus code: %lu\n", statuscode);
-		httpcCloseContext(&context);
-		return -2;
+		if (statuscode >= 300 && statuscode < 400) {
+			char newUrl[1024];
+			ret = httpcGetResponseHeader(&context, (char*)"Location", newUrl, 1024);
+			if (ret != 0)
+			{
+				printf("Could not get relocation header in 3XX http response");
+				return ret;
+			}
+			httpcCloseContext(&context);
+			ret = downloadToFile(newUrl, filepath);
+			return ret;
+		}
+		else
+		{
+			printf("error: status code not 200 or redirection (3XX).\nStatus code: %lu\n", statuscode);
+			httpcCloseContext(&context);
+			return -2;
+		}
 	}
 	
 	ret = httpcGetDownloadSizeState(&context, NULL, &contentsize);
 	if (ret != 0)
 	{
-		printf("error in:\nhttpcGetDownloadSizeState\nreturn: %"PRId32"\n", ret);
+		printf("error in:\nhttpcGetDownloadSizeState\nreturn: %lx\n", ret);
 		httpcCloseContext(&context);
 		return ret;
 	}
@@ -61,7 +88,7 @@ Result downloadToFile(const char *url, const char *filepath)
 	if(ret != 0)
 	{
 		free(buf);
-		printf("error in:\nhttpcDownloadData\nreturn: %"PRId32"\n", ret);
+		printf("error in:\nhttpcDownloadData\nreturn: %lx\n", ret);
 		httpcCloseContext(&context);
 		return ret;
 	}

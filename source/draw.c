@@ -13,11 +13,11 @@ void drawMenu(char ** names, u8 * done, u8 * errors, u32 selected_entry)
 		
 		if ((i+1) == selected_entry )
 		{
-			strcat(format, "\x1b[2;47"); //selected entry has gray background
+			strcat(format, "\x1b[47"); //selected entry has gray background
 		}
 		else
 		{
-			strcat(format, "\x1b[0;40"); //otherwise, black background
+			strcat(format, "\x1b[40"); //otherwise, black background
 		}
 		
 		if (done[i] == 1)
@@ -26,7 +26,7 @@ void drawMenu(char ** names, u8 * done, u8 * errors, u32 selected_entry)
 		}
 		else if (errors[i] == 1)
 		{
-			strcat(format, ";31m"); //entries where retrieval of name has failed have red text
+			strcat(format, ";31m"); //entries where errors have happened have red text
 		}
 		else if ((i+1) == selected_entry)
 		{

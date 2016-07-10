@@ -1,107 +1,99 @@
 #include "file.h"
-#include "unzip.h"
+#include "minizip/unzip.h"
 
-#include <time.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <utime.h>
-
-#define WRITEBUFFERSIZE (8192)
-
-int do_extract_currentfile(unzFile uf, const char * filepath)
+int extractFile(unzFile uf, const char * filename, const char * filepath)
 {
-	unz_file_info64 file_info = {0};
-	FILE* fout = NULL;
-	void* buf = NULL;
-	uInt size_buf = WRITEBUFFERSIZE;
-	int err = UNZ_OK;
-	int errclose = UNZ_OK;
-	char filename_inzip[256] = {0};
-
-	err = unzGetCurrentFileInfo64(uf, &file_info, filename_inzip, sizeof(filename_inzip), NULL, 0, NULL, 0);
-	if (err != UNZ_OK)
-	{
-		// printf("error %d with zipfile in unzGetCurrentFileInfo\n",err);
-		return err;
-	}
-
-	buf = (void*)malloc(size_buf);
-	if (buf == NULL)
-	{
-		// printf("Error allocating memory\n");
-		return UNZ_INTERNALERROR;
-	}
+	FILE * fp = NULL;
+	void * buf = NULL;
+	unz_file_info payloadInfo = {};
+	int ret = 0;
 	
-	unzOpenCurrentFile(uf);
-	fout = fopen(filepath, "wb");
-
-	/* Read from the zip, unzip to buffer, and write to disk */
-	if (fout != NULL)
+	ret = unzLocateFile(uf, filename, NULL);
+	
+	if (ret == UNZ_END_OF_LIST_OF_FILE)
 	{
-		// printf(" extracting: %s\n", inzip);
-
-		do
+		return 1;
+	}
+	else if (ret == UNZ_OK)
+	{
+		ret = unzGetCurrentFileInfo(uf, &payloadInfo, NULL, 0, NULL, 0, NULL, 0);
+		if (ret != UNZ_OK)
 		{
-			err = unzReadCurrentFile(uf, buf, size_buf);
-			if (err < 0)
+			return 2;
+		}
+		
+		buf = (u8 *)malloc(payloadInfo.uncompressed_size);
+		if (buf == NULL)
+		{
+			return 3;
+		}
+		memset(buf, 0, payloadInfo.uncompressed_size);
+		
+		ret = unzOpenCurrentFile(uf);
+		if (ret != UNZ_OK) {
+			return 4;
+		}
+		
+		fp = fopen(filepath, "wb");
+		
+		if (fp != NULL)
+		{
+			ret = unzReadCurrentFile(uf, buf, payloadInfo.uncompressed_size);
+			if (ret > 0)
 			{
-				// printf("error %d with zipfile in unzReadCurrentFile\n", err);
-				break;
+				if (fwrite(buf, payloadInfo.uncompressed_size, 1, fp) != 1)
+				{
+					return 5;
+				}
 			}
-			if (err == 0)
+			else
 			{
-				break;
+				return 6;
 			}
-			
-			if (fwrite(buf, err, 1, fout) != 1)
+
+			if (fp)
 			{
-				// printf("error %d in writing extracted file\n", errno);
-				err = UNZ_ERRNO;
-				break;
+				fclose(fp);
+				return 0;
 			}
 		}
-		while (err > 0);
-
-		if (fout)
-		{
-			fclose(fout);
-		}
+		return 7;
 	}
-
-	errclose = unzCloseCurrentFile(uf);
-	if (errclose != UNZ_OK)
+	else
 	{
-		// printf("error %d with zipfile in unzCloseCurrentFile\n", errclose);
+		return 8;
 	}
-
-	free(buf);
-	return err;
-}
-
-int do_extract_onefile(unzFile uf, const char * filename, const char * filepath)
-{
-	if (unzLocateFile(uf, filename, NULL) != UNZ_OK)
-	{
-		return 2;
-	}
-	if (do_extract_currentfile(uf, filepath) == UNZ_OK)
-	{
-		return 0;
-	}
-	return 1;
 }
 
 void extractFileFromZip(const char * zip_path, const char * filename, const char * filepath)
 {
 	unzFile uf = NULL;
+	
 	if (zip_path != NULL)
 	{
 		uf = unzOpen64(zip_path);
 	}
 	
-	do_extract_onefile(uf, filename, filepath);
-		
-	unzClose(uf);
+	int ret = 9; 
+	
+	if (uf != NULL)
+	{
+		ret = extractFile(uf, filename, filepath);
+		unzClose(uf);
+	}
+	
+	char * error_reports[] = {
+		"Everything went OK",
+		"Could not find the file in the zip",
+		"Failed to get file info",
+		"Failed to malloc the buffer",
+		"Failed to open the file in the zip",
+		"Failed to write to the SD",
+		"Failed to read the file in the zip",
+		"Failed to open the file on the SD",
+		"Error in unzLocateFile",
+		"Failed to open the zip file"
+	};
+	
+	printf("file extraction from zip:\n%s\n", error_reports[ret]);
 }
