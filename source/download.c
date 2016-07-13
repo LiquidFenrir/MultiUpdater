@@ -2,6 +2,19 @@
 
 Result downloadToFile(const char * url, const char * filepath)
 {
+	
+	if ( url == NULL )
+	{
+		printf("download cannot start, url is blank");
+		return 1;
+	}
+	
+	if ( filepath == NULL )
+	{
+		printf("download cannot start, filepath is blank");
+		return 1;
+	}
+	
 	printf("downloading file from:\n%s\nto:\n%s\n", url, filepath);
 	
 	httpcContext context;
@@ -64,7 +77,7 @@ Result downloadToFile(const char * url, const char * filepath)
 		{
 			printf("error: status code not 200 or redirection (3XX).\nStatus code: %lu\n", statuscode);
 			httpcCloseContext(&context);
-			return -2;
+			return -1;
 		}
 	}
 	

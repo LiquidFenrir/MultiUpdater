@@ -65,7 +65,7 @@ int extractFile(unzFile uf, const char * filename, const char * filepath)
 	}
 }
 
-void extractFileFromZip(const char * zip_path, const char * filename, const char * filepath)
+Result extractFileFromZip(const char * zip_path, const char * filename, const char * filepath)
 {
 	unzFile uf = NULL;
 	
@@ -74,11 +74,15 @@ void extractFileFromZip(const char * zip_path, const char * filename, const char
 		uf = unzOpen64(zip_path);
 	}
 	
-	int ret = 9; 
+	Result ret = 9; 
 	
 	if (uf != NULL)
 	{
 		ret = extractFile(uf, filename, filepath);
+		if (ret == 0)
+		{
+			remove(zip_path);
+		}
 		unzClose(uf);
 	}
 	
@@ -96,4 +100,6 @@ void extractFileFromZip(const char * zip_path, const char * filename, const char
 	};
 	
 	printf("file extraction from zip:\n%s\n", error_reports[ret]);
+	
+	return ret;
 }

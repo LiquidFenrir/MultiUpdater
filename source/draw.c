@@ -22,7 +22,7 @@ void drawMenu(char ** names, u8 * done, u8 * errors, u32 selected_entry)
 		
 		if (done[i] == 1)
 		{
-			strcat(format, ";32m"); //already downloaded entries have green/lime text
+			strcat(format, ";32m"); //already completed entries have green/lime text
 		}
 		else if (errors[i] == 1)
 		{

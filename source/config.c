@@ -20,7 +20,8 @@ void parse_entries(json_t * entries_elem, config * todo_config)
 		todo_config->entries_number = entries_number;
 		
 		for (u16 i = 0; i < entries_number; i++) {
-			if (json_is_object(json_array_get(entries_elem, i))) {
+			if (json_is_object(json_array_get(entries_elem, i)))
+			{
 				json_object_foreach(json_array_get(entries_elem, i), key, value) {
 					if(json_is_string(value)) {
 						if(!strcmp(key, NAME_STRING))
@@ -42,6 +43,10 @@ void parse_entries(json_t * entries_elem, config * todo_config)
 					}
 				}
 			}
+			else
+			{
+				todo_config->errorState = ERROR_JSON;
+			}
 		}
 	}
 	else
@@ -50,7 +55,7 @@ void parse_entries(json_t * entries_elem, config * todo_config)
 	}
 }
 
-json_t *load_json(const char *text) {
+json_t * load_json(const char * text) {
 	json_t *root;
 	json_error_t error;
 	
@@ -63,12 +68,14 @@ json_t *load_json(const char *text) {
 	}
 }
 
-void get_config(const char * filepath, config *parsed_config)
+void get_config(const char * filepath, config * parsed_config)
 {
-
+	
+	parsed_config->entries_number = 1;
+	parsed_config->errorState = 0;
+	
 	FILE * fptr = fopen(filepath, "rt");
-	if (!fptr) {
-		parsed_config->entries_number = 1;
+	if (fptr == NULL) {
 		parsed_config->errorState = ERROR_FILE;
 	}
 	
@@ -81,7 +88,6 @@ void get_config(const char * filepath, config *parsed_config)
 	
 	json_t *root = load_json(config_contents);
 	if (root == 0) {
-		parsed_config->entries_number = 1;
 		parsed_config->errorState = ERROR_JSON;
 	}
 	

@@ -3,10 +3,12 @@
 *.bnr
 *.icn
 *.icon
-*.rsf
 *.3dsx
 *.elf
 *.bat
 *.lnk
 *.cia
+*.lst
+*.map
 build/*
+out/*
