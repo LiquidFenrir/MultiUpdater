@@ -1,27 +1,34 @@
 {
 	"entries": [
 		{
-			"name": "Luma3DS",
-			"url": "http://luma3ds.ericchu.net/latest/",
-			"path": "/arm9loaderhax.bin"
-		},
-		{
-			"name": "Hourglass9",
-			"url": "https://d0k3.secretalgorithm.com/latest/Hourglass9",
-			"inzip": "Hourglass9.bin",
-			"path": "/luma/payloads/start_Hourglass9.bin"
-		},
-		{
-			"name": "Decrypt9WIP",
+			"name": "Decrypt9WIP (latest commit)",
 			"url": "https://d0k3.secretalgorithm.com/latest/Decrypt9WIP",
 			"inzip": "Decrypt9WIP.bin",
 			"path": "/luma/payloads/x_Decrypt9WIP.bin"
 		},
 		{
-			"name": "EmuNAND9",
-			"url": "https://d0k3.secretalgorithm.com/latest/EmuNAND9",
-			"inzip": "EmuNAND9.bin",
-			"path": "/luma/payloads/y_EmuNAND9.bin"
+			"name": "GodMode9 (latest commit)",
+			"url": "https://d0k3.secretalgorithm.com/latest/GodMode9",
+			"inzip": "GodMode9.bin",
+			"path": "/luma/payloads/up_GodMode9.bin"
+		},
+		{
+			"name": "Hourglass9 (latest commit)",
+			"url": "https://d0k3.secretalgorithm.com/latest/Hourglass9",
+			"inzip": "Hourglass9.bin",
+			"path": "/luma/payloads/start_Hourglass9.bin"
+		},
+		{
+			"name": "Luma3DS (latest commit)",
+			"url": "https://astronautlevel2.github.io/Luma3DS/latest.zip",
+			"inzip": "out/arm9loaderhax.bin",
+			"path": "/arm9loaderhax.bin"
+		},
+		{
+			"name": "Luma3DS (latest stable)",
+			"url": "https://astronautlevel2.github.io/Luma3DS/release.zip",
+			"inzip": "out/arm9loaderhax.bin",
+			"path": "/arm9loaderhax.bin"
 		}
 	]
 }
