@@ -109,6 +109,14 @@ int main()
 						state[selected_entry] = DL_ERROR;
 					}
 				}
+				else if (ret == 6)
+				{
+					state[selected_entry]++;
+					if (state[selected_entry] > DL_ERROR)
+					{
+						state[selected_entry] = 0;
+					}
+				}
 				else
 				{
 					printf("\x1b[40;31mDownload failed. Retry or check your config.json.\x1b[40;37m\n");

@@ -5,13 +5,13 @@ Result downloadToFile(const char * url, const char * filepath)
 
 	if ( url == NULL )
 	{
-		printf("Download cannot start, the URL in config.json is blank.");
+		printf("Download cannot start, the URL in config.json is blank.\n");
 		return 1;
 	}
 
 	if ( filepath == NULL )
 	{
-		printf("Download cannot start, file path in config.json is blank.");
+		printf("Download cannot start, file path in config.json is blank.\n");
 		return 1;
 	}
 
@@ -66,12 +66,26 @@ Result downloadToFile(const char * url, const char * filepath)
 			ret = httpcGetResponseHeader(&context, (char*)"Location", newUrl, 1024);
 			if (ret != 0)
 			{
-				printf("Could not get relocation header in 3XX HTTP response.");
+				printf("Could not get relocation header in 3XX HTTP response.\n");
 				return ret;
 			}
 			httpcCloseContext(&context);
-			ret = downloadToFile(newUrl, filepath);
-			return ret;
+			if (newUrl[0] != '/')
+			{
+				ret = downloadToFile(newUrl, filepath);
+				return ret;
+			}
+			else
+			{
+				printf("Reocation header is a relative url, not handled yet.\n");
+				return 1;
+			}
+		}
+		else if (statuscode == CITRA_STATUSCODE)
+		{
+			printf("Error: Running in Citra, changing state\n");
+			httpcCloseContext(&context);
+			return 6;
 		}
 		else
 		{
