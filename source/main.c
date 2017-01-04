@@ -126,7 +126,7 @@ int main()
 	else
 	{
 		printf("\x1b[40;31m\x1b[13;2Herror\x1b[0m");
-		printf("\x1b[40;31m\x1b[13;2H%s\x1b[0m", config_errors[parsed_config.errorState]);
+		printf("\x1b[40;31m\x1b[13;2H%s\x1b[0m", config_errors[parsed_config.errorState-1]);
 		while (aptMainLoop()) {
 
 			hidScanInput();

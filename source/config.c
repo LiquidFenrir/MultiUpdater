@@ -74,9 +74,10 @@ void get_config(const char * filepath, config * parsed_config)
 	parsed_config->entries_number = 1;
 	parsed_config->errorState = 0;
 	
-	FILE * fptr = fopen(filepath, "rt");
+	FILE * fptr = fopen(filepath, "r");
 	if (fptr == NULL) {
 		parsed_config->errorState = ERROR_FILE;
+		return;
 	}
 	
 	fseek(fptr, 0, SEEK_END);
