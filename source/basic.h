@@ -9,3 +9,6 @@
 
 #define ERROR_JSON 1
 #define ERROR_FILE 2
+
+#define DL_DONE 1
+#define DL_ERROR 2

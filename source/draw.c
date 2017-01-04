@@ -1,6 +1,6 @@
 #include "draw.h"
 
-void drawMenu(char ** names, u8 * done, u8 * errors, u32 selected_entry)
+void drawMenu(char ** names, u8 * state, u32 selected_entry)
 {
 	for (u8 i = 0; i <= 40; i++) {
 		printf("\x1b[0;40;37m\x1b[5;%uH=", (4+i));
@@ -11,30 +11,24 @@ void drawMenu(char ** names, u8 * done, u8 * errors, u32 selected_entry)
 		char format[64];
 		sprintf(format, "\x1b[%lu;4H", (i+6));
 		
-		if ((i+1) == selected_entry )
+		if (i == selected_entry )
 		{
-			strcat(format, "\x1b[47"); //selected entry has gray background
+			strcat(format, "\x1b[47;30m"); //selected entry has gray background and black text
 		}
 		else
 		{
 			strcat(format, "\x1b[40"); //otherwise, black background
-		}
-		
-		if (done[i] == 1)
-		{
-			strcat(format, ";32m"); //already completed entries have green/lime text
-		}
-		else if (errors[i] == 1)
-		{
-			strcat(format, ";31m"); //entries where errors have happened have red text
-		}
-		else if ((i+1) == selected_entry)
-		{
-			strcat(format, ";30m"); //selected entry has black text
-		}
-		else
-		{
-			strcat(format, ";37m"); //all the others have white text
+			switch (state[i]) {
+				case DL_DONE:
+					strcat(format, ";32m"); //already completed entries have green/lime text
+					break;
+				case DL_ERROR:
+					strcat(format, ";31m"); //entries where errors have happened have red text
+					break;
+				default:
+					strcat(format, ";37m"); //all the others have white text
+					break;
+			}
 		}
 		
 		strcat(format, "%s");

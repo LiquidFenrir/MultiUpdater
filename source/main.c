@@ -31,19 +31,18 @@ int main()
 
 	if (parsed_config.errorState == 0)
 	{
-		u32 selected_entry = 1;
+		u32 selected_entry = 0;
 
 		char * names[256];
 		for (u16 i = 0; i < parsed_config.entries_number; i++) {
 			names[i] = (char *)parsed_config.entries[i].name;
 		}
-		u8 done[256] = {0};
-		u8 errors[256] = {0};
+		u8 state[256] = {0};
 
 		while (aptMainLoop()) {
 
 			consoleSelect(&topScreen);
-			drawMenu(names, done, errors, selected_entry);
+			drawMenu(names, state, selected_entry);
 			consoleSelect(&bottomScreen);
 
 			hidScanInput();
@@ -55,31 +54,31 @@ int main()
 			else if (hidKeysDown() & KEY_DOWN)
 			{
 				selected_entry++;
-				if (selected_entry > parsed_config.entries_number) {
-					selected_entry = parsed_config.entries_number;
+				if (selected_entry >= parsed_config.entries_number) {
+					selected_entry = parsed_config.entries_number-1;
 				}
 			}
 			else if (hidKeysDown() & KEY_UP)
 			{
 				selected_entry--;
-				if (selected_entry < 1) {
-					selected_entry = 1;
+				if (selected_entry >= parsed_config.entries_number) {
+					selected_entry = 0;
 				}
 			}
 			else if (hidKeysDown() & KEY_A)
 			{
 				Result ret = 1;
 				printf("\x1b[40;32mStarting download... ");
-				if (parsed_config.entries[selected_entry-1].zip_path == NULL) {
+				if (parsed_config.entries[selected_entry].zip_path == NULL) {
 					printf("Direct file\x1b[40;37m\n");
-					ret = downloadToFile(parsed_config.entries[selected_entry-1].url, parsed_config.entries[selected_entry-1].path);
+					ret = downloadToFile(parsed_config.entries[selected_entry].url, parsed_config.entries[selected_entry].path);
 				}
 				else
 				{
 					printf("ZIP archive\x1b[40;37m\n");
 					char filepath[256];
-					sprintf(filepath, "%s%s.zip", WORKING_DIR, names[selected_entry-1]);
-					ret = downloadToFile(parsed_config.entries[selected_entry-1].url, filepath);
+					sprintf(filepath, "%s%s.zip", WORKING_DIR, names[selected_entry]);
+					ret = downloadToFile(parsed_config.entries[selected_entry].url, filepath);
 					if (ret == 0)
 					{
 						ret = 7;
@@ -89,31 +88,31 @@ int main()
 				{
 					printf("\x1b[40;32mDownload complete!\x1b[40;37m\n");
 					printf("\x1b[40;32mUpdate complete!\x1b[40;37m\n");
-					done[selected_entry-1] = 1;
+					state[selected_entry] = DL_DONE;
 				}
 				else if (ret == 7)
 				{
 					printf("\x1b[40;32mDownload complete!\x1b[40;37m\n");
 					printf("\x1b[40;32mExtracting files from archive...\x1b[40;37m\n");
 					char filepath[256];
-					sprintf(filepath, "%s%s.zip", WORKING_DIR, names[selected_entry-1]);
-					ret = extractFileFromZip(filepath, parsed_config.entries[selected_entry-1].zip_path, parsed_config.entries[selected_entry-1].path);
+					sprintf(filepath, "%s%s.zip", WORKING_DIR, names[selected_entry]);
+					ret = extractFileFromZip(filepath, parsed_config.entries[selected_entry].zip_path, parsed_config.entries[selected_entry].path);
 					if (ret == 0)
 					{
 						printf("\x1b[40;32mExtraction complete!\x1b[40;37m\n");
 						printf("\x1b[40;32mUpdate complete!\x1b[40;37m\n");
-						done[selected_entry-1] = 1;
+						state[selected_entry] = DL_DONE;
 					}
 					else
 					{
 						printf("\x1b[40;31mExtraction failed. Retry or check your config.json.\x1b[40;37m\n");
-						errors[selected_entry-1] = 1;
+						state[selected_entry] = DL_ERROR;
 					}
 				}
 				else
 				{
 					printf("\x1b[40;31mDownload failed. Retry or check your config.json.\x1b[40;37m\n");
-					errors[selected_entry-1] = 1;
+					state[selected_entry] = DL_ERROR;
 				}
 			}
 
