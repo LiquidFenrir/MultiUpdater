@@ -1,5 +1,5 @@
 #include "basic.h"
 
-#define CITRA_STATUSCODE 512
+#define CITRA_STATUSCODE 11
 
-Result downloadToFile(const char *url, const char *filepath);
+Result downloadToFile(const char * url, const char * filepath);
