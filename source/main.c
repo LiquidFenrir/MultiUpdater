@@ -7,11 +7,10 @@ u8 update(config parsed_config, char ** names, u8 selected_entry)
 {
 	Result ret = 0;
 	printf("\x1b[40;32mStarting download... ");
-	
+
 	if (parsed_config.entries[selected_entry].zip_path == NULL) {
 		printf("Direct file\x1b[40;37m\n");
 		ret = downloadToFile(parsed_config.entries[selected_entry].url, parsed_config.entries[selected_entry].path);
-		printf("blehD\n");
 		if (ret == 0)
 		{
 			printf("\x1b[40;32mDownload complete!\x1b[40;37m\n");
@@ -22,7 +21,7 @@ u8 update(config parsed_config, char ** names, u8 selected_entry)
 	else
 	{
 		printf("ZIP archive\x1b[40;37m\n");
-		
+
 		char filepath[256];
 		sprintf(filepath, "%s%s.zip", WORKING_DIR, names[selected_entry]);
 		for (u8 i = 0; filepath[i]; i++) //replace all spaces in the path with underscores
@@ -30,9 +29,8 @@ u8 update(config parsed_config, char ** names, u8 selected_entry)
 			if ((u8 )filepath[i] == 0x20)
 				filepath[i] = 0x5F;
 		}
-		
+
 		ret = downloadToFile(parsed_config.entries[selected_entry].url, filepath);
-		printf("blehA\n");
 		if (ret == 0)
 		{
 			printf("\x1b[40;32mDownload complete!\x1b[40;37m\n");
@@ -51,10 +49,10 @@ u8 update(config parsed_config, char ** names, u8 selected_entry)
 			}
 		}
 	}
-	
+
 	if (ret == 6)
 		return 0;
-	
+
 	printf("\x1b[40;31mDownload failed. Retry or check your config.json.\x1b[40;37m\n");
 	return DL_ERROR;
 }
@@ -68,7 +66,7 @@ int main()
 	PrintConsole topScreen, bottomScreen;
 	consoleInit(GFX_TOP, &topScreen);
 	consoleInit(GFX_BOTTOM, &bottomScreen);
-	
+
 	consoleSelect(&topScreen);
 	printf("\x1b[40;37m\x1b[2;2HMultiUpdater by LiquidFenrir\x1b[0m\x1b[0;0H");
 	printf("\x1b[40;37m\x1b[28;28H Press START to quit.\x1b[0m\x1b[0;0H");
@@ -143,7 +141,7 @@ int main()
 			"There is an error in your config.json.",
 			"The config.json could not be found."
 		};
-		
+
 		printf("\x1b[40;31m\x1b[13;2Herror\x1b[0m");
 		printf("\x1b[40;31m\x1b[13;2H%s\x1b[0m", config_errors[parsed_config.errorState-1]);
 		while (aptMainLoop()) {
