@@ -2,19 +2,19 @@
 	"entries": [
 		{
 			"name": "Decrypt9WIP (latest commit)",
-			"url": "https://d0k3.secretalgorithm.com/latest/Decrypt9WIP",
+			"url": "https://d0k3.secretalgorithm.com/Decrypt9WIP/latest.zip",
 			"inzip": "Decrypt9WIP.bin",
 			"path": "/luma/payloads/x_Decrypt9WIP.bin"
 		},
 		{
 			"name": "GodMode9 (latest commit)",
-			"url": "https://d0k3.secretalgorithm.com/latest/GodMode9",
+			"url": "https://d0k3.secretalgorithm.com/GodMode9/latest.zip",
 			"inzip": "GodMode9.bin",
 			"path": "/luma/payloads/up_GodMode9.bin"
 		},
 		{
 			"name": "Hourglass9 (latest commit)",
-			"url": "https://d0k3.secretalgorithm.com/latest/Hourglass9",
+			"url": "https://d0k3.secretalgorithm.com/Hourglass9/latest.zip",
 			"inzip": "Hourglass9.bin",
 			"path": "/luma/payloads/start_Hourglass9.bin"
 		},
