@@ -10,5 +10,6 @@
 #define ERROR_JSON 1
 #define ERROR_FILE 2
 
-#define DL_DONE 1
-#define DL_ERROR 2
+#define UPDATE_ERROR 1
+#define UPDATE_DONE 2
+#define STATE_MARKED 4

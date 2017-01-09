@@ -91,14 +91,13 @@ Result downloadToBuffer(const char * url, u8 ** buf, u32 * bufsize)
 		if (ret == (s32)HTTPC_RESULTCODE_DOWNLOADPENDING) {
 			
 			hidScanInput();
-			if (hidKeysDown() & KEY_B)
-			{
-				printf("Download cancelled.\n");
+
+			if (hidKeysDown() & KEY_B) {
 				if (newurl != NULL) free(newurl);
 				if (lastbuf != NULL) free(lastbuf);
 				if (buf != NULL) free(buf);
 				httpcCloseContext(&context);
-				return -1;
+				return 7;
 			}
 			
 			lastbuf = *buf; // Save the old pointer, in case realloc() fails.
@@ -155,7 +154,7 @@ Result downloadToFile(const char * url, const char * filepath)
 	
 	ret = downloadToBuffer(url, &buf, &size);
 	if (ret != 0) return ret;
-		
+	
 	FILE *fptr = fopen(filepath, "wb");
 	if (fptr == NULL) {
 		printf("Couldnt open file to write.\n");
