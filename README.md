@@ -10,8 +10,7 @@ This project requires ctrulib, zlib, and jansson in your environment.
 zlib and jansson can be installed with [3ds_portlibs](https://github.com/devkitPro/3ds_portlibs)
 
 # Compilation
-Just run `make` in terminal. Bannertool and makerom **must** be in your PATH for or CIA compilation will fail.
-There **WILL** be compilation warnings, not caused by my code but by minizip.
+Just run `make` in terminal. Bannertool and makerom **must** be in your PATH or CIA compilation will fail.
 
 # License
 MultiUpdater is licensed under the MIT license, a copy of which can be found in the [LICENSE file](../blob/master/LICENSE).  

@@ -5,19 +5,19 @@
 u8 update(config parsed_config, u8 selected_entry)
 {
 	Result ret = 0;
-	printf("\x1b[40;32mStarting download... ");
+	printf("\x1b[40;32mStarting download...");
 
 	if (parsed_config.entries[selected_entry].zip_path == NULL) {
-		printf("Direct file\x1b[40;37m\n");
+		printf("Direct file\n");
 		
 		ret = downloadToFile(parsed_config.entries[selected_entry].url, parsed_config.entries[selected_entry].path);
 		if (ret == 0) {
-			printf("\x1b[40;32mDownload complete!\x1b[40;37m\n");
+			printf("\x1b[40;32mDownload complete!\n");
 			goto update;
 		}
 	}
 	else {
-		printf("ZIP archive\x1b[40;37m\n");
+		printf("ZIP archive\x1b[0m\n");
 
 		char filepath[256];
 		sprintf(filepath, "%s%s.zip", WORKING_DIR, parsed_config.entries[selected_entry].name);
@@ -27,30 +27,28 @@ u8 update(config parsed_config, u8 selected_entry)
 
 		ret = downloadToFile(parsed_config.entries[selected_entry].url, filepath);
 		if (ret == 0) {
-			printf("\x1b[40;32mDownload complete!\x1b[40;37m\n");
-			printf("\x1b[40;32mExtracting files from archive...\x1b[40;37m\n");
+			printf("\x1b[40;32mDownload complete!\n");
+			printf("Extracting files from archive...\n");
 			ret = extractFileFromZip(filepath, parsed_config.entries[selected_entry].zip_path, parsed_config.entries[selected_entry].path);
-			if (ret == 0) {
-				printf("\x1b[40;32mExtraction complete!\x1b[40;37m\n");
-				goto update;
-			}
-			else {
-				printf("\x1b[40;31mExtraction failed. Retry or check your config.json.\x1b[40;37m\n");
+			if (ret != 0) {
+				printf("\x1b[40;31mExtraction failed. Retry or check your config.json.");
 				return UPDATE_ERROR;
 			}
+			printf("\x1b[40;32mExtraction complete!\n");
+			goto update;
 		}
 	}
 	
 	if (ret == 7) {
-		printf("Update cancelled.\n");
+		printf("\x1b[40;33mUpdate cancelled.\n");
 		return 0; //just remove the marking
 	}
 	
-	printf("\x1b[40;31mDownload failed. Retry or check your config.json.\x1b[40;37m\n");
+	printf("\x1b[40;31mDownload failed. Retry or check your config.json.");
 	return UPDATE_ERROR;
 	
 	update:
-		printf("\x1b[40;32mUpdate complete!\x1b[40;37m\n");
+		printf("\x1b[40;32mUpdate complete!");
 		return UPDATE_DONE;
 	
 }
@@ -66,9 +64,9 @@ int main()
 	consoleInit(GFX_BOTTOM, &bottomScreen);
 
 	consoleSelect(&topScreen);
-	printf("\x1b[40;37m\x1b[2;2HMultiUpdater by LiquidFenrir\x1b[0m\x1b[0;0H");
-	printf("\x1b[40;37m\x1b[27;2HPress SELECT to show instructions.\x1b[0m\x1b[0;0H");
-	printf("\x1b[40;37m\x1b[28;2HPress START to exit.\x1b[0m\x1b[0;0H");
+	printf("\x1b[2;2HMultiUpdater %s by LiquidFenrir", VERSION_STRING);
+	printf("\x1b[27;2HPress SELECT to show instructions.");
+	printf("\x1b[28;2HPress START to exit.\x1b[0;0H");
 
 	char filepath[256];
 	strcat(filepath, WORKING_DIR);
@@ -119,11 +117,11 @@ int main()
 			else if (hidKeysDown() & KEY_Y) { //mark/unmark selected entry
 				state[selected_entry] ^= STATE_MARKED;
 			}
-			else if (hidKeysDown() & KEY_A) //update all marked entries and currently selected entry (even if it's not marked)
-			{
+			else if (hidKeysDown() & KEY_A) { //update all marked entries and currently selected entry (even if it's not marked)
 				for (u8 i = 0; i < parsed_config.entries_number; i++) {
 					if (i == selected_entry || state[i] & STATE_MARKED) {
 						u8 ret = update(parsed_config, i);
+						printf("\x1b[0m\n");
 						state[i] |= ret;
 						state[i] &= ~STATE_MARKED;
 					}
@@ -136,15 +134,14 @@ int main()
 			gspWaitForVBlank();
 		}
 	}
-	else
-	{
+	else {
 		char * config_errors[] = {
 			"There is an error in your config.json.",
 			"The config.json could not be found."
 		};
 		
-		printf("\x1b[40;31m\x1b[13;2Herror\x1b[0m");
-		printf("\x1b[40;31m\x1b[13;2H%s\x1b[0m", config_errors[parsed_config.errorState-1]);
+		printf("\x1b[40;31m\x1b[13;2Herror");
+		printf("\x1b[13;2H%s", config_errors[parsed_config.errorState-1]);
 		while (aptMainLoop()) {
 			
 			hidScanInput();

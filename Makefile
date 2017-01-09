@@ -38,13 +38,15 @@ APP_ICON := $(CURDIR)/$(ICON)
 
 _3DSXFLAGS += --smdh=$(CURDIR)/$(TARGET).smdh
 
+VERSION := $(shell git describe --tags)
+
 # Compiler flags
 
 ARCH     := -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
 CFLAGS   := -g -Wall -O3 -Wextra -mword-relocations \
             -fomit-frame-pointer -ffunction-sections \
-            $(ARCH) $(EXTRACFLAGS)
+            $(ARCH) $(EXTRACFLAGS) -DVERSION_STRING="\"$(VERSION)\""
 
 CFLAGS   += $(INCLUDE) -DARM11 -D_3DS
 

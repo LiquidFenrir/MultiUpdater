@@ -7,11 +7,13 @@ u8 scroll = 0;
 void drawInstructions()
 {
 	printf("\x1b[40;33m" //color the text to make it more noticeable
-				 "Press (A) to update the highlighted\n and marked entries.\n" 
-				 "\n"
-				 "Press (Y) to mark or unmark the\n highlighted entry.\n" 
-				 "Press [L] to mark all entries.\n" 
-				 "Press [R] to unmark all entries.\x1b[0m\n");
+	       "Press (A) to update the highlighted\n and marked entries.\n" 
+	       "Press (B) to backup the highlighted\n and marked entries.\n" 
+	       "Press (X) to restore the backups of the\n highlighted and marked entries\n"
+	       "\n"
+	       "Press (Y) to mark or unmark the\n highlighted entry.\n" 
+	       "Press [L] to mark all entries.\n" 
+	       "Press [R] to unmark all entries.\x1b[0m\n");
 }
 
 void drawMenu(config * parsed_config, u8 * state, u8 selected_entry)
