@@ -1,13 +1,23 @@
 #include "draw.h"
 
+#define MAX_ENTRIES_PER_SCREEN 18
+u8 scroll = 0;
+
 void drawMenu(char ** names, u8 * state, u8 selected_entry)
 {
+	if (selected_entry >= (MAX_ENTRIES_PER_SCREEN + scroll)) {
+		scroll++;
+	}
+	else if ((selected_entry - scroll) < 0) {
+		scroll--;
+	}
+	
 	for (u8 i = 0; i <= 40; i++) {
 		printf("\x1b[0;40;37m\x1b[5;%uH=", (4+i));
 		printf("\x1b[0;40;37m\x1b[24;%uH=", (4+i));
 	}
 	
-	for(u8 i = 0; i < 18; i++) {
+	for(u8 i = scroll; i < (MAX_ENTRIES_PER_SCREEN + scroll); i++) {
 		char format[64];
 		sprintf(format, "\x1b[%u;4H", (i+6));
 		
