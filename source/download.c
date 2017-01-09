@@ -39,12 +39,7 @@ Result downloadToBuffer(const char * url, u8 ** buf, u32 * bufsize)
 			return ret;
 		}
 		
-		if (statuscode == CITRA_STATUSCODE) {
-			printf("Error: Running in Citra, changing state\n");
-			httpcCloseContext(&context);
-			return 6;
-		}
-		else if ((statuscode >= 301 && statuscode <= 303) || (statuscode >= 307 && statuscode <= 308)) {
+		if ((statuscode >= 301 && statuscode <= 303) || (statuscode >= 307 && statuscode <= 308)) {
 			if (newurl == NULL) newurl = malloc(0x1000); // One 4K page for new URL
 				if (newurl == NULL) {
 					httpcCloseContext(&context);

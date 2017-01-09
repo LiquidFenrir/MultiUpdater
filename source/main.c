@@ -46,10 +46,6 @@ u8 update(config parsed_config, u8 selected_entry)
 			}
 		}
 	}
-
-	if (ret == 6)
-		return 0;
-
 	printf("\x1b[40;31mDownload failed. Retry or check your config.json.\x1b[40;37m\n");
 	return DL_ERROR;
 }
@@ -109,16 +105,7 @@ int main()
 			else if (hidKeysDown() & KEY_A)
 			{
 				u8 ret = update(parsed_config, i);
-				if (ret != 0)
-				{
-					state[selected_entry] = ret;
-				}
-				else //if on citra, cycle through the different states
-				{
-					state[selected_entry]++;
-					if (state[selected_entry] > DL_ERROR)
-						state[selected_entry] = 0;
-				}
+				state[selected_entry] = ret;
 			}
 
 			gfxFlushBuffers();
