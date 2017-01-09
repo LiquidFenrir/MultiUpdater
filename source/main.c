@@ -1,9 +1,8 @@
-#include "config.h"
 #include "download.h"
 #include "draw.h"
 #include "file.h"
 
-u8 update(config parsed_config, char ** names, u8 selected_entry)
+u8 update(config parsed_config, u8 selected_entry)
 {
 	Result ret = 0;
 	printf("\x1b[40;32mStarting download... ");
@@ -23,11 +22,9 @@ u8 update(config parsed_config, char ** names, u8 selected_entry)
 		printf("ZIP archive\x1b[40;37m\n");
 
 		char filepath[256];
-		sprintf(filepath, "%s%s.zip", WORKING_DIR, names[selected_entry]);
-		for (u8 i = 0; filepath[i]; i++) //replace all spaces in the path with underscores
-		{
-			if ((u8 )filepath[i] == 0x20)
-				filepath[i] = 0x5F;
+		sprintf(filepath, "%s%s.zip", WORKING_DIR, parsed_config.entries[selected_entry].name);
+		for (u8 i = 0; filepath[i]; i++) { //replace all spaces in the path with underscores 
+			if ((u8 )filepath[i] == 0x20) filepath[i] = 0x5F;
 		}
 
 		ret = downloadToFile(parsed_config.entries[selected_entry].url, filepath);
@@ -81,17 +78,12 @@ int main()
 	if (parsed_config.errorState == 0)
 	{
 		u8 selected_entry = 0;
-
-		char * names[256];
-		for (u16 i = 0; i < parsed_config.entries_number; i++) {
-			names[i] = (char *)parsed_config.entries[i].name;
-		}
 		u8 state[256] = {0};
 
 		while (aptMainLoop()) {
 
 			consoleSelect(&topScreen);
-			drawMenu(names, state, selected_entry);
+			drawMenu(&parsed_config, state, selected_entry);
 			consoleSelect(&bottomScreen);
 
 			hidScanInput();
@@ -116,7 +108,7 @@ int main()
 			}
 			else if (hidKeysDown() & KEY_A)
 			{
-				u8 ret = update(parsed_config, names, selected_entry);
+				u8 ret = update(parsed_config, i);
 				if (ret != 0)
 				{
 					state[selected_entry] = ret;
