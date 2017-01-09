@@ -82,6 +82,6 @@ Result extractFileFromZip(const char * zip_path, const char * filename, const ch
 		unzClose(uf);
 	}
 	
-	printf("%i", remove(zip_path));
+	remove(zip_path);
 	return ret;
 }
