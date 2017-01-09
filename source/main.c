@@ -67,7 +67,8 @@ int main()
 
 	consoleSelect(&topScreen);
 	printf("\x1b[40;37m\x1b[2;2HMultiUpdater by LiquidFenrir\x1b[0m\x1b[0;0H");
-	printf("\x1b[40;37m\x1b[28;28H Press START to quit.\x1b[0m\x1b[0;0H");
+	printf("\x1b[40;37m\x1b[27;2HPress SELECT to show instructions.\x1b[0m\x1b[0;0H");
+	printf("\x1b[40;37m\x1b[28;2HPress START to exit.\x1b[0m\x1b[0;0H");
 
 	char filepath[256];
 	strcat(filepath, WORKING_DIR);
@@ -91,6 +92,9 @@ int main()
 			
 			if (hidKeysDown() & KEY_START) {
 				break;
+			}
+			else if (hidKeysDown() & KEY_SELECT) {
+				drawInstructions();
 			}
 			else if (hidKeysDown() & KEY_DOWN) {
 				selected_entry++;
