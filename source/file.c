@@ -1,6 +1,42 @@
 #include "file.h"
 #include "minizip/unzip.h"
 
+Result copyFile(const char * srcpath, const char * destpath)
+{
+	if (srcpath == NULL || destpath == NULL) {
+		printf("Can't copy, path is empty.\n");
+		return -1;
+	}
+	
+	FILE *srcptr = fopen(srcpath, "rb");
+	if (srcptr == NULL) {
+		printf("Can't copy, source file doesn't exist.\n");
+		return -2;
+	}
+	
+	FILE *destptr = fopen(destpath, "wb");
+	if (destptr == NULL) {
+		printf("Couldnt open destination file to write.\n");
+		return -3;
+	}
+	
+	printf("Copying:\n%s\nto:\n%s\n", srcpath, destpath);
+	
+	fseek(srcptr, 0, SEEK_END);
+	u32 size = ftell(srcptr);
+	fseek(srcptr, 0, SEEK_SET);
+	
+	u8 * buf = malloc(size);
+	fread(buf, 1, size, srcptr);
+	fwrite(buf, 1, size, destptr);
+	
+	fclose(srcptr);
+	fclose(destptr);
+	free(buf);
+	
+	return 0;
+}
+
 int extractFile(unzFile uf, const char * filename, const char * filepath)
 {
 	FILE * fp = NULL;

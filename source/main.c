@@ -127,6 +127,49 @@ int main()
 					}
 				}
 			}
+			else if (hidKeysDown() & KEY_B) { //backup all marked entries and currently selected entry (even if it's not marked)
+				for (u8 i = 0; i < parsed_config.entries_number; i++) {
+					if (i == selected_entry || state[i] & STATE_MARKED) {
+						char backuppath[256];
+						sprintf(backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
+						for (u8 i = 0; backuppath[i]; i++) { //replace all spaces in the path with underscores 
+							if ((u8 )backuppath[i] == 0x20) backuppath[i] = 0x5F;
+						}
+						printf("\x1b[40;32mBacking up %s...\x1b[0m\n", parsed_config.entries[i].name);
+						
+						Result ret = copyFile(parsed_config.entries[i].path, backuppath);
+						if (ret != 0) {
+							printf("\x1b[40;31mBackup failed...");
+						}
+						else {
+							printf("\x1b[40;32mBackup complete!");
+						}
+						printf("\x1b[0m\n");
+					}
+				}
+			}
+			else if (hidKeysDown() & KEY_X) { //restore the backups of all marked entries and currently selected entry (even if it's not marked)
+				for (u8 i = 0; i < parsed_config.entries_number; i++) {
+					if (i == selected_entry || state[i] & STATE_MARKED) {
+						char backuppath[256];
+						sprintf(backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
+						for (u8 i = 0; backuppath[i]; i++) { //replace all spaces in the path with underscores 
+							if ((u8 )backuppath[i] == 0x20) backuppath[i] = 0x5F;
+						}
+						printf("\x1b[40;Restoring %s...\x1b[0m\n", parsed_config.entries[i].name);
+						
+						Result ret = copyFile(backuppath, parsed_config.entries[i].path);
+						if (ret != 0) {
+							printf("\x1b[40;31mRestore failed...");
+						}
+						else {
+							printf("\x1b[40;32mRestore complete!");
+							remove(backuppath);
+						}
+						printf("\x1b[0m\n");
+					}
+				}
+			}
 			
 			gfxFlushBuffers();
 			gfxSwapBuffers();
