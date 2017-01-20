@@ -18,7 +18,15 @@ void drawInstructions()
 
 void drawMenu(config * parsed_config, u8 * state, u8 selected_entry)
 {
-	if (selected_entry >= (MAX_ENTRIES_PER_SCREEN + scroll)) {
+	if (selected_entry == 0) {
+		scroll = 0;
+	}
+	else if(selected_entry == parsed_config->entries_number-1) {
+		scroll = parsed_config->entries_number - MAX_ENTRIES_PER_SCREEN;
+		if (scroll >= parsed_config->entries_number)
+			scroll = 0;
+	}
+	else if (selected_entry >= (MAX_ENTRIES_PER_SCREEN + scroll)) {
 		scroll++;
 	}
 	else if ((selected_entry - scroll) < 0) {

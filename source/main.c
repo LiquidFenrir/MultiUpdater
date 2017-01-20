@@ -104,6 +104,12 @@ int main()
 				if (selected_entry >= parsed_config.entries_number)
 					selected_entry = 0;
 			}
+			else if (hidKeysDown() & KEY_RIGHT) { //go to bottom of the menu
+				selected_entry = parsed_config.entries_number-1;
+			}
+			else if (hidKeysDown() & KEY_LEFT) { //go to top of the menu
+				selected_entry = 0;
+			}
 			else if (hidKeysDown() & KEY_L) { //mark all entries
 				for (u8 i = 0; i < parsed_config.entries_number; i++) {
 					state[i] |= STATE_MARKED;
