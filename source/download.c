@@ -5,7 +5,7 @@ Result downloadToBuffer(const char * url, u8 ** buf, u32 * bufsize)
 	
 	httpcContext context;
 	Result ret = 0;
-	char *newurl = NULL;
+	char * newurl = NULL;
 	u32 statuscode = 0;
 	u32 contentsize = 0, readsize = 0, size = 0;
 	u8 * lastbuf = NULL;
@@ -47,18 +47,23 @@ Result downloadToBuffer(const char * url, u8 ** buf, u32 * bufsize)
 				}
 			
 			ret = httpcGetResponseHeader(&context, "Location", newurl, 0x1000);
-			url = newurl; // Change pointer to the url that we just learned
 			httpcCloseContext(&context); // Close this context before we try the next
-			if (newurl[0] != '/') {
-				printf("Redirecting to url: %s\n",url);
-				ret = downloadToBuffer(newurl, buf, bufsize);
-				return ret;
+			
+			if (newurl[0] == '/') { //if the url starts with a slash, it's local
+				int slashpos = 0;
+				char * domainname = strdup(url);
+				if (strncmp("http", domainname, 4) == 0) slashpos = 7; //if the url in the entry starts with http:// or https:// we need to skip that
+				slashpos += (int )strchr(domainname+slashpos, '/');
+				domainname[slashpos] = '\0'; // replace the slash with a nullbyte to cut the url
+				char * copyurl = strdup(newurl);
+				sprintf(newurl, "%s%s", domainname, copyurl);
+				free(copyurl);
+				free(domainname);
 			}
-			else {
-				if (newurl != NULL) free(newurl);
-				printf("Error: relative urls not handled yet.\n");
-				return -2;
-			}
+			url = newurl; // Change pointer to the url that we just learned
+			printf("Redirecting to url: %s\n", url);
+			ret = downloadToBuffer(newurl, buf, bufsize);
+			return ret;
 		}
 	} while ((statuscode >= 301 && statuscode <= 303) || (statuscode >= 307 && statuscode <= 308));
 	
