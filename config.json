@@ -1,34 +1,34 @@
 {
 	"entries": [
 		{
-			"name": "Decrypt9WIP (latest commit)",
+			"name": "Decrypt9WIP (latest commit - tool deprecated!)",
 			"url": "https://d0k3.secretalgorithm.com/Decrypt9WIP/latest.zip",
-			"inzip": "Decrypt9WIP.bin",
-			"path": "/luma/payloads/x_Decrypt9WIP.bin"
+			"inzip": "Decrypt9WIP.firm",
+			"path": "/luma/payloads/x_Decrypt9WIP.firm"
 		},
 		{
 			"name": "GodMode9 (latest commit)",
 			"url": "https://d0k3.secretalgorithm.com/GodMode9TD/latest.zip",
-			"inzip": "GodMode9.bin",
-			"path": "/luma/payloads/up_GodMode9.bin"
+			"inzip": "GodMode9.firm",
+			"path": "/luma/payloads/up_GodMode9.firm"
 		},
 		{
-			"name": "Hourglass9 (latest commit)",
+			"name": "Hourglass9 (latest commit - tool deprecated!)",
 			"url": "https://d0k3.secretalgorithm.com/Hourglass9/latest.zip",
-			"inzip": "Hourglass9.bin",
-			"path": "/luma/payloads/start_Hourglass9.bin"
+			"inzip": "Hourglass9.firm",
+			"path": "/luma/payloads/start_Hourglass9.firm"
 		},
 		{
 			"name": "Luma3DS (latest commit)",
 			"url": "https://astronautlevel2.github.io/Luma3DS/latest.zip",
-			"inzip": "out/arm9loaderhax.bin",
-			"path": "/arm9loaderhax.bin"
+			"inzip": "out/boot.firm",
+			"path": "/boot.firm"
 		},
 		{
 			"name": "Luma3DS (latest stable)",
 			"url": "https://astronautlevel2.github.io/Luma3DS/release.zip",
-			"inzip": "out/arm9loaderhax.bin",
-			"path": "/arm9loaderhax.bin"
+			"inzip": "out/boot.firm",
+			"path": "/boot.firm"
 		}
 	]
 }
