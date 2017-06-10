@@ -1,56 +1,50 @@
 #include "download.h"
 #include "draw.h"
 #include "file.h"
+#include "cia.h"
 
-u8 update(config_t parsed_config, u8 selected_entry)
+u8 update(entry_t entry)
 {
 	Result ret = 0;
-	printf("\x1b[40;32mStarting download...");
-
-	if (parsed_config.entries[selected_entry].zip_path == NULL) {
-		printf("Direct file\n");
-		
-		ret = downloadToFile(parsed_config.entries[selected_entry].url, parsed_config.entries[selected_entry].path);
-		if (ret == 0) {
-			printf("\x1b[40;32mDownload complete!\n");
-			goto update;
-		}
-	}
+	printf("\x1b[40;34mBeginning update...\x1b[0m\n");
+	
+	char dl_path[256] = {0};
+	
+	//if the file to download isnt an archive, direcly download where wanted
+	if (entry.zip_path == NULL)
+		strcpy(dl_path, entry.path);
+	//otherwise, download to a zip in the working dir, then extract where wanted
 	else {
-		printf("ZIP archive\x1b[0m\n");
-
-		char filepath[256];
-		sprintf(filepath, "%s%s.zip", WORKING_DIR, parsed_config.entries[selected_entry].name);
-		for (u8 i = 0; filepath[i]; i++) { //replace all spaces in the path with underscores 
-			if ((u8 )filepath[i] == 0x20) filepath[i] = 0x5F;
-		}
-
-		ret = downloadToFile(parsed_config.entries[selected_entry].url, filepath);
-		if (ret == 0) {
-			printf("\x1b[40;32mDownload complete!\n");
-			printf("Extracting files from archive...\n");
-			ret = extractFileFromZip(filepath, parsed_config.entries[selected_entry].zip_path, parsed_config.entries[selected_entry].path);
-			if (ret != 0) {
-				printf("\x1b[40;31mExtraction failed. Retry or check your config.json.");
-				return UPDATE_ERROR;
-			}
-			printf("\x1b[40;32mExtraction complete!\n");
-			goto update;
+		sprintf(dl_path, "%s%s.zip", WORKING_DIR, entry.name);
+		for (u8 i = 0; dl_path[i]; i++) { //replace all spaces in the path with underscores 
+			if ((u8 )dl_path[i] == 0x20) dl_path[i] = 0x5F;
 		}
 	}
 	
-	if (ret == 7) {
-		printf("\x1b[40;33mUpdate cancelled.\n");
-		return 0; //just remove the marking
+	ret = downloadToFile(entry.url, dl_path);
+	
+	if (ret != 0) {
+		printf("\x1b[40;31mDownload failed!");
+		goto failure;
+	}
+	else printf("\x1b[40;32mDownload successful!");
+	
+	if (entry.zip_path != NULL) {
+		printf("\n\x1b[40;34mExtracting file from the zip...\x1b[0m\n");
+		ret = extractFileFromZip(dl_path, entry.zip_path, entry.path);
+		if (ret != 0) {
+			printf("\x1b[40;31mExtraction failed!");
+			goto failure;
+		}
+		else printf("\x1b[40;32mExtraction successful!");
 	}
 	
-	printf("\x1b[40;31mDownload failed. Retry or check your config.json.");
+	printf("\n\x1b[40;32mUpdate complete!");
+	return UPDATE_DONE;
+	
+	failure:
+	printf("\nError: 0x%08x", (unsigned int)ret);
 	return UPDATE_ERROR;
-	
-	update:
-		printf("\x1b[40;32mUpdate complete!");
-		return UPDATE_DONE;
-	
 }
 
 int main()
@@ -126,7 +120,7 @@ int main()
 			else if (hidKeysDown() & KEY_A) { //update all marked entries and currently selected entry (even if it's not marked)
 				for (u8 i = 0; i < parsed_config.entries_number; i++) {
 					if (i == selected_entry || state[i] & STATE_MARKED) {
-						u8 ret = update(parsed_config, i);
+						u8 ret = update(parsed_config.entries[i]);
 						printf("\x1b[0m\n");
 						state[i] |= ret;
 						state[i] &= ~STATE_MARKED;
@@ -202,7 +196,7 @@ int main()
 			gspWaitForVBlank();
 		}
 	}
-
+	
 	fsExit();
 	httpcExit();
 	gfxExit();
