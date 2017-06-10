@@ -2,7 +2,7 @@
 #include "draw.h"
 #include "file.h"
 
-u8 update(config parsed_config, u8 selected_entry)
+u8 update(config_t parsed_config, u8 selected_entry)
 {
 	Result ret = 0;
 	printf("\x1b[40;32mStarting download...");
@@ -72,7 +72,7 @@ int main()
 	strcat(filepath, WORKING_DIR);
 	strcat(filepath, "config.json");
 
-	config parsed_config;
+	config_t parsed_config;
 	get_config(filepath, &parsed_config);
 
 	if (parsed_config.errorState == 0) {

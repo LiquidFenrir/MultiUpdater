@@ -16,7 +16,7 @@ void drawInstructions()
 	       "Press [R] to unmark all entries.\x1b[0m\n");
 }
 
-void drawMenu(config * parsed_config, u8 * state, u8 selected_entry)
+void drawMenu(config_t * parsed_config, u8 * state, u8 selected_entry)
 {
 	if (selected_entry == 0) {
 		scroll = 0;

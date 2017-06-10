@@ -7,12 +7,12 @@ typedef struct {
 	const char * url;
 	const char * path;
 	const char * zip_path;
-} entry;
+} entry_t;
 
 typedef struct {
 	u8 errorState;
 	u8 entries_number;
-	entry entries[256];
-} config;
+	entry_t entries[256];
+} config_t;
 
-void get_config(const char * filepath, config * parsed_config);
+void get_config(const char * filepath, config_t * parsed_config);

@@ -9,7 +9,7 @@
 #define PATH_STRING "path"
 #define ZIP_PATH_STRING "inzip"
 
-void parse_entries(json_t * entries_elem, config * todo_config)
+void parse_entries(json_t * entries_elem, config_t * todo_config)
 {
 	if (json_is_array(entries_elem)) {
 		
@@ -68,7 +68,7 @@ json_t * load_json(const char * text) {
 	}
 }
 
-void get_config(const char * filepath, config * parsed_config)
+void get_config(const char * filepath, config_t * parsed_config)
 {
 	
 	parsed_config->entries_number = 1;
