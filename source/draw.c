@@ -46,31 +46,23 @@ void drawMenu(config * parsed_config, u8 * state, u8 selected_entry)
 			char format[64];
 			sprintf(format, "\x1b[%u;4H", (i+6-scroll));
 			
-			if (i == selected_entry ) {
-				strcat(format, "\x1b[47;30m"); //selected entry has gray background
+			strcat(format, (i == selected_entry) ? "\x1b[47;" : "\x1b[40;"); //selected entry has gray background, otherwise, black background
+			if (state[i] & STATE_MARKED) {
+				strcat(format, "33"); //marked entries have yellow text
+			}
+			else if (state[i] & UPDATE_DONE) {
+				strcat(format, "32"); //already completed entries have green/lime text
+			}
+			else if (state[i] & UPDATE_ERROR) {
+				strcat(format, "31"); //entries where errors have happened have red text
 			}
 			else {
-				strcat(format, "\x1b[40"); //otherwise, black background
-				if (state[i] & STATE_MARKED) {
-					strcat(format, ";33m"); //marked entries have yellow text
-				}
-				else if (state[i] & UPDATE_DONE) {
-					strcat(format, ";32m"); //already completed entries have green/lime text
-				}
-				else if (state[i] & UPDATE_ERROR) {
-					strcat(format, ";31m"); //entries where errors have happened have red text
-				}
-				else {
-					strcat(format, ";37m"); //all the others have white text
-				}
+				strcat(format, (i == selected_entry) ? "30" : "37"); //all the others have white text, except the selected which has black
 			}
 			
-			strcat(format, "%s");
-			for (u8 i = 0; i < (MENU_WIDTH - strlen(current_name) + 1); i++) {
-				strcat(format, " ");
-			}
-			
-			printf(format, current_name);
+			//always print * characters, with padding if needed, and truncate if over
+			strcat(format, "m%*.*s");
+			printf(format, -(MENU_WIDTH+1), MENU_WIDTH+1, current_name); //the - tells it to pad to the right
 		}
 	}
 }
