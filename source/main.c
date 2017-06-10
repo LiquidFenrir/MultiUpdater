@@ -63,8 +63,7 @@ int main()
 	printf("\x1b[28;2HPress START to exit.\x1b[0;0H");
 
 	char filepath[256];
-	strcat(filepath, WORKING_DIR);
-	strcat(filepath, "config.json");
+	sprintf(filepath, "%sconfig.json", WORKING_DIR);
 
 	config_t parsed_config;
 	get_config(filepath, &parsed_config);
