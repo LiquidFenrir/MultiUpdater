@@ -7,7 +7,7 @@
 #define NAME_STRING "name"
 #define URL_STRING "url"
 #define PATH_STRING "path"
-#define ZIP_PATH_STRING "inzip"
+#define IN_ZIP_STRING "inzip"
 
 void parse_entries(json_t * entries_elem, config_t * todo_config)
 {
@@ -36,9 +36,9 @@ void parse_entries(json_t * entries_elem, config_t * todo_config)
 						{
 							todo_config->entries[i].path = strdup(json_string_value(value));
 						}
-						else if(!strcmp(key, ZIP_PATH_STRING))
+						else if(!strcmp(key, IN_ZIP_STRING))
 						{
-							todo_config->entries[i].zip_path = strdup(json_string_value(value));
+							todo_config->entries[i].in_zip = strdup(json_string_value(value));
 						}
 					}
 				}

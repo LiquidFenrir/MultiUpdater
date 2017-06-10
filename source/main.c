@@ -11,7 +11,7 @@ u8 update(entry_t entry)
 	char dl_path[256] = {0};
 	
 	//if the file to download isnt an archive, direcly download where wanted
-	if (entry.zip_path == NULL)
+	if (entry.in_zip == NULL)
 		strcpy(dl_path, entry.path);
 	//otherwise, download to a zip in the working dir, then extract where wanted
 	else {
@@ -29,9 +29,9 @@ u8 update(entry_t entry)
 	}
 	else printf("\x1b[40;32mDownload successful!");
 	
-	if (entry.zip_path != NULL) {
+	if (entry.in_zip != NULL) {
 		printf("\n\x1b[40;34mExtracting file from the zip...\x1b[0m\n");
-		ret = extractFileFromZip(dl_path, entry.zip_path, entry.path);
+		ret = extractFileFromZip(dl_path, entry.in_zip, entry.path);
 		if (ret != 0) {
 			printf("\x1b[40;31mExtraction failed!");
 			goto failure;

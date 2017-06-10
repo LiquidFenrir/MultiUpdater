@@ -109,13 +109,13 @@ int extractFile(unzFile uf, const char * filename, const char * filepath)
 	}
 }
 
-Result extractFileFromZip(const char * zip_path, const char * filename, const char * filepath)
+Result extractFileFromZip(const char * in_zip, const char * filename, const char * filepath)
 {
 	unzFile uf = NULL;
 
-	if (zip_path != NULL)
+	if (in_zip != NULL)
 	{
-		uf = unzOpen64(zip_path);
+		uf = unzOpen64(in_zip);
 	}
 
 	Result ret = 9;
@@ -126,6 +126,6 @@ Result extractFileFromZip(const char * zip_path, const char * filename, const ch
 		unzClose(uf);
 	}
 	
-	remove(zip_path);
+	remove(in_zip);
 	return ret;
 }

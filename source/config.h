@@ -6,7 +6,7 @@ typedef struct {
 	const char * name;
 	const char * url;
 	const char * path;
-	const char * zip_path;
+	const char * in_zip;
 } entry_t;
 
 typedef struct {
