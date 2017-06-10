@@ -1,5 +1,6 @@
 #include "download.h"
-	
+#include "gitapi.h"
+
 Result setupContext(httpcContext * context, const char * url, u32 * size)
 {
 	Result ret = 0;
@@ -150,4 +151,79 @@ Result downloadToFile(const char * url, const char * filepath)
 	}
 	
 	return 0;
+}
+
+Result downloadFromRelease(const char * url, const char * element, const char * filepath)
+{
+	if (url == NULL) {
+		printf("Download cannot start, the URL in config.json is blank.\n");
+		return DL_ERROR_CONFIG;
+	}
+	
+	if (element == NULL) {
+		printf("Download cannot start, inrelease in config.json is blank.\n");
+		return DL_ERROR_CONFIG;
+	}
+	
+	if (filepath == NULL) {
+		printf("Download cannot start, file path in config.json is blank.\n");
+		return DL_ERROR_CONFIG;
+	}
+	
+	char * copyurl = strdup(url);
+	char * repo_name = copyurl;
+	char * repo_owner = copyurl;
+	char apiurl[256] = {0};
+	
+	unsigned int startpos = 0;
+	if (strncmp("http", copyurl, 4) == 0) startpos = 8; //if the url in the entry starts with http:// or https:// we need to skip that
+	for (unsigned int i = startpos; copyurl[i]; i++) {
+		if (copyurl[i] == '/') {
+			copyurl[i] = '\0';
+			if (repo_owner == copyurl) repo_owner += i+1;
+			else if (repo_name == copyurl) repo_name += i+1;
+			else break;
+		}
+	}
+	sprintf(apiurl, "https://api.github.com/repos/%s/%s/releases/latest", repo_owner, repo_name);
+	printf("Downloading latest release from repo:\n%s\nby:\n%s\n", repo_name, repo_owner);
+	printf("Crafted api url:\n%s\n", apiurl);
+	free(copyurl);
+	
+	httpcContext context;
+	Result ret = 0;
+	u32 contentsize = 0, readsize = 0;
+	
+	ret = setupContext(&context, apiurl, &contentsize);
+	if (ret != 0) return ret;
+	
+	printf("Downloading %lu bytes...\n", contentsize);
+	
+	char * buf = malloc(contentsize);
+	if (buf == NULL) {
+		httpcCloseContext(&context);
+		return DL_ERROR_ALLOC;
+	}
+	
+	u64 startTime = osGetTime();
+	do {
+		ret = httpcDownloadData(&context, (u8 *)buf, contentsize, &readsize);
+	} while (ret == (Result)HTTPC_RESULTCODE_DOWNLOADPENDING);
+	printf("Download took %llu milliseconds.\n", osGetTime()-startTime);
+	
+	httpcCloseContext(&context);
+	if (ret != 0) {
+		printf("Error in:\nhttpcDownloadData\n");
+		free(buf);
+		return ret;
+	}
+	
+	char * asseturl = NULL;
+	getAssetUrl((const char *)buf, element, &asseturl);
+	free(buf);
+	
+	ret = downloadToFile(asseturl, filepath);
+	free(asseturl);
+	
+	return ret;
 }

@@ -9,3 +9,4 @@
 
 Result setupContext(httpcContext * context, const char * url, u32 * size);
 Result downloadToFile(const char * url, const char * filepath);
+Result downloadFromRelease(const char * url, const char * element, const char * filepath);

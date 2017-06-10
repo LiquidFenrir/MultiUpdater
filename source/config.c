@@ -8,6 +8,7 @@
 #define URL_STRING "url"
 #define PATH_STRING "path"
 #define IN_ZIP_STRING "inzip"
+#define IN_RELEASE_STRING "inrelease"
 
 void parse_entries(json_t * entries_elem, config_t * todo_config)
 {
@@ -39,6 +40,10 @@ void parse_entries(json_t * entries_elem, config_t * todo_config)
 						else if(!strcmp(key, IN_ZIP_STRING))
 						{
 							todo_config->entries[i].in_zip = strdup(json_string_value(value));
+						}
+						else if(!strcmp(key, IN_RELEASE_STRING))
+						{
+							todo_config->entries[i].in_release = strdup(json_string_value(value));
 						}
 					}
 				}
@@ -119,5 +124,6 @@ void clean_config(config_t * parsed_config)
 		free((char*)(parsed_config->entries[i].url));
 		free((char*)(parsed_config->entries[i].path));
 		free((char*)(parsed_config->entries[i].in_zip));
+		free((char*)(parsed_config->entries[i].in_release));
 	}
 }
