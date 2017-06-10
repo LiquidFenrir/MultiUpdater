@@ -111,3 +111,13 @@ void get_config(const char * filepath, config_t * parsed_config)
 	free(config_contents);
 	json_decref(root);
 }
+
+void clean_config(config_t * parsed_config)
+{
+	for (int i = 0; i < parsed_config->entries_number; i++) {
+		free((char*)(parsed_config->entries[i].name));
+		free((char*)(parsed_config->entries[i].url));
+		free((char*)(parsed_config->entries[i].path));
+		free((char*)(parsed_config->entries[i].in_zip));
+	}
+}

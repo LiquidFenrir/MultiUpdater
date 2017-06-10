@@ -83,6 +83,8 @@ int main()
 			hidScanInput();
 			
 			if (hidKeysDown() & KEY_START) {
+				//strings copied with strdup need to be freed
+				clean_config(&parsed_config);
 				break;
 			}
 			else if (hidKeysDown() & KEY_SELECT) {

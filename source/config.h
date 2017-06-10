@@ -16,3 +16,4 @@ typedef struct {
 } config_t;
 
 void get_config(const char * filepath, config_t * parsed_config);
+void clean_config(config_t * parsed_config);
