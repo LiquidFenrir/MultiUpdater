@@ -26,9 +26,17 @@ Result copyFile(const char * srcpath, const char * destpath)
 	u32 size = ftell(srcptr);
 	fseek(srcptr, 0, SEEK_SET);
 	
-	u8 * buf = malloc(size);
-	fread(buf, 1, size, srcptr);
-	fwrite(buf, 1, size, destptr);
+	printf("Copying %lu bytes.\n", size);
+	
+	u32 toRead = 0x1000;
+	u8 * buf = malloc(toRead);
+	
+	do {
+		if (size < toRead) toRead = size;
+		fread(buf, 1, toRead, srcptr);
+		fwrite(buf, 1, toRead, destptr);
+		size -= toRead;
+	} while(size);
 	
 	fclose(srcptr);
 	fclose(destptr);
