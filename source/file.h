@@ -1,3 +1,5 @@
+#pragma once
+
 #include "basic.h"
 
 Result copyFile(const char * srcpath, const char * destpath);
