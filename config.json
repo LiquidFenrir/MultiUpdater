@@ -1,22 +1,29 @@
 {
 	"entries": [
 		{
-			"name": "Decrypt9WIP (latest commit - tool deprecated!)",
-			"url": "https://d0k3.secretalgorithm.com/Decrypt9WIP/latest.zip",
-			"inzip": "Decrypt9WIP.firm",
-			"path": "/luma/payloads/x_Decrypt9WIP.firm"
+			"name": "MultiUpdater (latest release)",
+			"url": "https://github.com/LiquidFenrir/MultiUpdater",
+			"inrelease": "MultiUpdater.zip",
+			"inzip": "MultiUpdater.cia",
+			"path": "/cias/MultiUpdater.cia"
+		},
+		{
+			"name": "Themely (latest release)",
+			"url": "https://github.com/ErmanSayin/Themely",
+			"inrelease": "Themely.cia",
+			"path": "/cias/Themely.cia"
 		},
 		{
 			"name": "GodMode9 (latest commit)",
 			"url": "https://d0k3.secretalgorithm.com/GodMode9TD/latest.zip",
 			"inzip": "GodMode9.firm",
-			"path": "/luma/payloads/up_GodMode9.firm"
+			"path": "/luma/payloads/GodMode9.firm"
 		},
 		{
-			"name": "Hourglass9 (latest commit - tool deprecated!)",
-			"url": "https://d0k3.secretalgorithm.com/Hourglass9/latest.zip",
-			"inzip": "Hourglass9.firm",
-			"path": "/luma/payloads/start_Hourglass9.firm"
+			"name": "CTRXplorer (latest commit)",
+			"url": "https://d0k3.secretalgorithm.com/CTRXplorer/latest.zip",
+			"inzip": "3ds-arm/CTRXplorer.cia",
+			"path": "/cias/CTRXplorer.cia"
 		},
 		{
 			"name": "Luma3DS (latest commit)",
