@@ -39,6 +39,18 @@ u8 update(entry_t entry)
 		else printf("\x1b[40;32mExtraction successful!");
 	}
 	
+	//if the extracted/downloaded file ends with ".cia", try to install it
+	if (strncmp(entry.path+strlen(entry.path)-4, ".cia", 4) == 0) {
+		printf("\n\x1b[40;34mInstalling CIA...\x1b[0m\n");
+		ret = installCia(entry.path);
+		if (ret != 0) {
+			printf("\x1b[40;31mInstall failed!");
+			goto failure;
+		}
+		else
+			printf("\x1b[40;32mInstall successful!");
+	}
+	
 	printf("\n\x1b[40;32mUpdate complete!");
 	return UPDATE_DONE;
 	
@@ -51,8 +63,10 @@ int main()
 {
 	gfxInitDefault();
 	httpcInit(0);
+	amInit();
 	fsInit();
-
+	AM_InitializeExternalTitleDatabase(false);
+	
 	PrintConsole topScreen, bottomScreen;
 	consoleInit(GFX_TOP, &topScreen);
 	consoleInit(GFX_BOTTOM, &bottomScreen);
@@ -199,6 +213,7 @@ int main()
 	}
 	
 	fsExit();
+	amExit();
 	httpcExit();
 	gfxExit();
 	return 0;

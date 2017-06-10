@@ -1,5 +1,5 @@
 # MultiUpdater
-MultiUpdater is an updater for FIRM payloads and other files on the SD card. The ability to update CIA applications is planned but has not been implemented.
+MultiUpdater is an updater for FIRM payloads, CIA applications, and other files on the SD card.
 
 # Configuration
 The configuration file is named `config.json` and should be placed in `/3ds/MultiUpdater/`.  
