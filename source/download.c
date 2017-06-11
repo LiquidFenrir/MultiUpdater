@@ -197,19 +197,16 @@ Result downloadFromRelease(const char * url, const char * element, const char * 
 	ret = setupContext(&context, apiurl, &contentsize);
 	if (ret != 0) return ret;
 	
-	printf("Downloading %lu bytes...\n", contentsize);
-	
-	char * buf = malloc(contentsize);
+	char * buf = malloc(contentsize+1);
 	if (buf == NULL) {
 		httpcCloseContext(&context);
 		return DL_ERROR_ALLOC;
 	}
+	buf[contentsize+1] = 0; //nullbyte to end it as a proper C style string
 	
-	u64 startTime = osGetTime();
 	do {
 		ret = httpcDownloadData(&context, (u8 *)buf, contentsize, &readsize);
 	} while (ret == (Result)HTTPC_RESULTCODE_DOWNLOADPENDING);
-	printf("Download took %llu milliseconds.\n", osGetTime()-startTime);
 	
 	httpcCloseContext(&context);
 	if (ret != 0) {
@@ -219,11 +216,16 @@ Result downloadFromRelease(const char * url, const char * element, const char * 
 	}
 	
 	char * asseturl = NULL;
+	printf("\x1b[40;34mSearching for asset %s in api response...\x1b[0m\n", element);
 	getAssetUrl((const char *)buf, element, &asseturl);
 	free(buf);
 	
-	ret = downloadToFile(asseturl, filepath);
-	free(asseturl);
+	if (asseturl == NULL)
+		ret = DL_ERROR_GIT;
+	else {
+		ret = downloadToFile(asseturl, filepath);
+		free(asseturl);
+	}
 	
 	return ret;
 }

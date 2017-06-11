@@ -2,4 +2,4 @@
 
 #include "basic.h"
 
-void getAssetUrl(const char * text, const char * element, char ** asseturl);
+void getAssetUrl(const char * apiresponse, const char * element, char ** asseturl);
