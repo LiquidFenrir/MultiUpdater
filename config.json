@@ -1,13 +1,6 @@
 {
 	"entries": [
 		{
-			"name": "MultiUpdater (latest release)",
-			"url": "https://github.com/LiquidFenrir/MultiUpdater",
-			"inrelease": "MultiUpdater.zip",
-			"inzip": "MultiUpdater.cia",
-			"path": "/cias/MultiUpdater.cia"
-		},
-		{
 			"name": "Themely (latest release)",
 			"url": "https://github.com/ErmanSayin/Themely",
 			"inrelease": "Themely.cia",
