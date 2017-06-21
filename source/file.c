@@ -45,87 +45,91 @@ Result copyFile(const char * srcpath, const char * destpath)
 	return 0;
 }
 
-int extractFile(unzFile uf, const char * filename, const char * filepath)
-{
-	FILE * fp = NULL;
-	void * buf = NULL;
-	unz_file_info payloadInfo = {};
-	int ret = 0;
-
-	ret = unzLocateFile(uf, filename, NULL);
-
-	if (ret == UNZ_END_OF_LIST_OF_FILE)
-	{
-		return 1;
-	}
-	else if (ret == UNZ_OK)
-	{
-		ret = unzGetCurrentFileInfo(uf, &payloadInfo, NULL, 0, NULL, 0, NULL, 0);
-		if (ret != UNZ_OK)
-		{
-			return 2;
-		}
-
-		buf = (u8 *)malloc(payloadInfo.uncompressed_size);
-		if (buf == NULL)
-		{
-			return 3;
-		}
-		memset(buf, 0, payloadInfo.uncompressed_size);
-
-		ret = unzOpenCurrentFile(uf);
-		if (ret != UNZ_OK) {
-			return 4;
-		}
-
-		fp = fopen(filepath, "wb");
-
-		if (fp != NULL)
-		{
-			ret = unzReadCurrentFile(uf, buf, payloadInfo.uncompressed_size);
-			if (ret > 0)
-			{
-				if (fwrite(buf, payloadInfo.uncompressed_size, 1, fp) != 1)
-				{
-					return 5;
-				}
-			}
-			else
-			{
-				return 6;
-			}
-
-			if (fp)
-			{
-				fclose(fp);
-				return 0;
-			}
-		}
-		return 7;
-	}
-	else
-	{
-		return 8;
-	}
-}
-
 Result extractFileFromZip(const char * in_zip, const char * filename, const char * filepath)
-{
-	unzFile uf = NULL;
-
-	if (in_zip != NULL)
-	{
-		uf = unzOpen64(in_zip);
-	}
-
-	Result ret = 9;
-
-	if (uf != NULL)
-	{
-		ret = extractFile(uf, filename, filepath);
-		unzClose(uf);
+{	
+	if (filename == NULL) {
+		printf("Cannot start, the inzip in config.json is blank.\n");
+		remove(in_zip);
+		return EXTRACTION_ERROR_CONFIG;
 	}
 	
+	if (filepath == NULL) {
+		printf("Cannot start, the path in config.json is blank.\n");
+		remove(in_zip);
+		return EXTRACTION_ERROR_CONFIG;
+	}
+	
+	Result ret = 0;
+	u8 * buf = NULL;
+	FILE * fh = NULL;
+	u64 offset = 0;
+	
+	fh =  fopen(filepath, "wb");
+	if (fh == NULL) {
+		remove(in_zip);
+		printf("Error: couldn't open file to write.\n");
+		return EXTRACTION_ERROR_WRITEFILE;
+	}
+	
+	unzFile uf = unzOpen64(in_zip);
+	if (uf == NULL) {
+		printf("Couldn't open zip file.\n");
+		remove(in_zip);
+		return EXTRACTION_ERROR_ZIP_OPEN;
+	}
+	
+	unz_file_info payloadInfo = {};
+	
+	ret = unzLocateFile(uf, filename, NULL);
+
+	if (ret == UNZ_END_OF_LIST_OF_FILE) {
+		printf("Couldn't find the wanted file in the zip.\n");
+		ret = EXTRACTION_ERROR_FIND;
+	}
+	else if (ret == UNZ_OK) {
+		ret = unzGetCurrentFileInfo(uf, &payloadInfo, NULL, 0, NULL, 0, NULL, 0);
+		if (ret != UNZ_OK) {
+			printf("Couldn't get the file information.\n");
+			ret = EXTRACTION_ERROR_INFO;
+			goto finish;
+		}
+		
+		u32 toRead = 0x1000;
+		buf = malloc(toRead);
+		if (buf == NULL) {
+			ret = EXTRACTION_ERROR_ALLOC;
+			goto finish;
+		}
+		
+		ret = unzOpenCurrentFile(uf);
+		if (ret != UNZ_OK) {
+			ret = EXTRACTION_ERROR_OPEN_INZIP;
+			goto finish;
+		}
+		
+		u32 size = payloadInfo.uncompressed_size;
+		
+		do {
+			if (size < toRead) toRead = size;
+			ret = unzReadCurrentFile(uf, buf, toRead);
+			if (ret > 0) {
+				fwrite(buf, 1, toRead, fh);
+				ret = 0;
+			}
+			else {
+				ret = EXTRACTION_ERROR_READ_INZIP;
+				goto finish;
+			}
+			size -= toRead;
+		} while(size);
+	}
+	
+	finish:
+	free(buf);
+	unzClose(uf);
 	remove(in_zip);
+	
+	elsefclose(fh);
+	
 	return ret;
 }
