@@ -11,11 +11,11 @@ u8 update(entry_t entry)
 	char dl_path[256] = {0};
 	
 	//if the file to download isnt an archive, direcly download where wanted
-	if (entry.in_zip == NULL)
+	if (entry.in_archive == NULL)
 		strcpy(dl_path, entry.path);
-	//otherwise, download to a zip in the working dir, then extract where wanted
+	//otherwise, download to an archive in the working dir, then extract where wanted
 	else {
-		sprintf(dl_path, "%s%s.zip", WORKING_DIR, entry.name);
+		sprintf(dl_path, "%s%s.archive", WORKING_DIR, entry.name);
 		for (u8 i = 0; dl_path[i]; i++) { //replace all spaces in the path with underscores 
 			if ((u8 )dl_path[i] == 0x20) dl_path[i] = 0x5F;
 		}
@@ -33,9 +33,9 @@ u8 update(entry_t entry)
 	}
 	else printf("\x1b[40;32mDownload successful!");
 	
-	if (entry.in_zip != NULL) {
-		printf("\n\x1b[40;34mExtracting file from the zip...\x1b[0m\n");
-		ret = extractFileFromZip(dl_path, entry.in_zip, entry.path);
+	if (entry.in_archive != NULL) {
+		printf("\n\x1b[40;34mExtracting file from the archive...\x1b[0m\n");
+		ret = extractFileFromArchive(dl_path, entry.in_archive, entry.path);
 		if (ret != 0) {
 			printf("\x1b[40;31mExtraction failed!");
 			goto failure;
