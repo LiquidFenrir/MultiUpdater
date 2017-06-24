@@ -258,10 +258,12 @@ Result extractFileFromArchive(const char * archive_path, const char * filename, 
 	
 	unzFile uf = unzOpen64(archive_path);
 	if (uf == NULL) {
+		printf("Opening as a 7z file...\n");
 		//failure to open as a zip -> must be 7z
 		ret = extractFileFrom7z(archive_path, filename, filepath);
 	}
 	else {
+		printf("Opening as a zip file...\n");
 		unzClose(uf);
 		ret = extractFileFromZip(archive_path, filename, filepath);
 	}
