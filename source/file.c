@@ -254,10 +254,10 @@ Result extractFileFromArchive(const char * archive_path, const char * filename, 
 {
 	Result ret = EXTRACTION_ERROR_ARCHIVE_OPEN;
 	
-	unzFile uf = unzOpen64(archive_file);
+	unzFile uf = unzOpen64(archive_path);
 	if (uf == NULL) {
 		//failure to open as a zip -> must be 7z
-		ret = extractFileFrom7z(archive_file, filename, filepath);
+		ret = extractFileFrom7z(archive_path, filename, filepath);
 	}
 	else {
 		unzClose(uf);
