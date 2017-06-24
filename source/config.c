@@ -7,7 +7,7 @@
 #define NAME_STRING "name"
 #define URL_STRING "url"
 #define PATH_STRING "path"
-#define IN_ARCHIVE_STRING "in_archive"
+#define IN_ARCHIVE_STRING "inarchive"
 #define IN_RELEASE_STRING "inrelease"
 
 void parse_entries(json_t * entries_elem, config_t * todo_config)

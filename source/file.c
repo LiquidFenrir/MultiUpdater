@@ -154,6 +154,8 @@ Result extractFileFrom7z(const char * archive_file, const char * filename, const
 			fclose(fh);
 			
 			free(buf);
+			
+			goto finish;
 		}
 	}
 	
