@@ -9,25 +9,33 @@
 		{
 			"name": "GodMode9 (latest commit)",
 			"url": "https://d0k3.secretalgorithm.com/GodMode9TD/latest.zip",
-			"inzip": "GodMode9.firm",
+			"inarchive": "GodMode9.firm",
+			"path": "/luma/payloads/GodMode9.firm"
+		},
+		{
+			"name": "GodMode9 (latest release)",
+			"url": "https://github.com/d0k3/GodMode9",
+			"inrelease": "GodMode9-*-*.zip",
+			"inarchive": "GodMode9.firm",
 			"path": "/luma/payloads/GodMode9.firm"
 		},
 		{
 			"name": "CTRXplorer (latest commit)",
 			"url": "https://d0k3.secretalgorithm.com/CTRXplorer/latest.zip",
-			"inzip": "3ds-arm/CTRXplorer.cia",
+			"inarchive": "3ds-arm/CTRXplorer.cia",
 			"path": "/cias/CTRXplorer.cia"
 		},
 		{
 			"name": "Luma3DS (latest commit)",
 			"url": "https://astronautlevel2.github.io/Luma3DS/latest.zip",
-			"inzip": "out/boot.firm",
+			"inarchive": "out/boot.firm",
 			"path": "/boot.firm"
 		},
 		{
-			"name": "Luma3DS (latest stable)",
-			"url": "https://astronautlevel2.github.io/Luma3DS/release.zip",
-			"inzip": "out/boot.firm",
+			"name": "Luma3DS (latest release)",
+			"url": "https://github.com/AuroraWright/Luma3DS",
+			"inrelease": "Luma3DSv*z",
+			"inarchive": "boot.firm",
 			"path": "/boot.firm"
 		}
 	]
