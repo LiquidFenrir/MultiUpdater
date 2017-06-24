@@ -14,9 +14,10 @@ Just run `make` in terminal. Bannertool and makerom **must** be in your PATH or 
 
 # License
 MultiUpdater is licensed under the MIT license, a copy of which can be found in the [LICENSE file](../blob/master/LICENSE).  
-The files located in `source/minizip` are part of [minizip](https://github.com/nmoinvaz/minizip) and are absolutely not created by me. They are licensed under the zlib license, a copy of which can be found in the [minizip-LICENSE file](../blob/master/minizip-LICENSE).
+The files located in `source/minizip` are part of [minizip](https://github.com/nmoinvaz/minizip) and are absolutely not created by me, but were slightly modified to remove compilation warnings. They are licensed under the zlib license, a copy of which can be found in the [minizip-LICENSE file](../blob/master/minizip-LICENSE).  
+The files located in `source/7z` are in the public domain, but I think it's better to add this. They were taken from [lumaupdate](https://github.com/Hamcha/lumaupdate)
 
 # Credits
 All of the ctrulib contributors, for ctrulib which this depends upon  
-Makefile by Hamcha  
+Makefile and 7z support by Hamcha  
 \#Cakey on freenode for help
