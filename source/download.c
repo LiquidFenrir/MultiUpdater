@@ -202,7 +202,7 @@ Result downloadFromRelease(const char * url, const char * element, const char * 
 		httpcCloseContext(&context);
 		return DL_ERROR_ALLOC;
 	}
-	buf[contentsize+1] = 0; //nullbyte to end it as a proper C style string
+	buf[contentsize] = 0; //nullbyte to end it as a proper C style string
 	
 	do {
 		ret = httpcDownloadData(&context, (u8 *)buf, contentsize, &readsize);
