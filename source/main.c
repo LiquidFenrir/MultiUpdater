@@ -16,9 +16,23 @@ u8 update(entry_t entry)
 	//otherwise, download to an archive in the working dir, then extract where wanted
 	else {
 		sprintf(dl_path, "%s%s.archive", WORKING_DIR, entry.name);
-		for (u8 i = 0; dl_path[i]; i++) { //replace all spaces in the path with underscores 
-			if ((u8 )dl_path[i] == 0x20) dl_path[i] = 0x5F;
-		}
+		for (int i = 0; dl_path[i]; i++) { //replace all spaces and fat32 reserved characters in the path with underscores 
+			switch (dl_path[i]) {
+				case ' ':
+				case '"':
+				case '/':
+				case '*':
+				case ':':
+				case '<':
+				case '>':
+				case '?':
+				case '\\':
+				case '|':
+					dl_path[i] = '_';
+				default:
+					break;
+			}
+}
 	}
 	
 	//if the entry doesnt want anything from a release, expect it to be a normal file
