@@ -37,7 +37,7 @@ u8 update(entry_t entry)
 	
 	//if the entry doesnt want anything from a release, expect it to be a normal file
 	if (entry.in_release == NULL)
-		ret = downloadToFile(entry.url, dl_path);
+		ret = downloadToFile(entry.url, dl_path, false);
 	else
 		ret = downloadFromRelease(entry.url, entry.in_release, dl_path);
 	

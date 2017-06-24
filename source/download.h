@@ -8,6 +8,6 @@
 #define DL_ERROR_CONFIG -4
 #define DL_ERROR_GIT -5
 
-Result setupContext(httpcContext * context, const char * url, u32 * size);
-Result downloadToFile(const char * url, const char * filepath);
+Result setupContext(httpcContext * context, const char * url, u32 * size, bool gitapi);
+Result downloadToFile(const char * url, const char * filepath, bool gitapi);
 Result downloadFromRelease(const char * url, const char * element, const char * filepath);

@@ -1,7 +1,10 @@
 #include "download.h"
 #include "gitapi.h"
 
-Result setupContext(httpcContext * context, const char * url, u32 * size)
+#include "certs/cybertrust.h"
+#include "certs/digicert.h"
+
+Result setupContext(httpcContext * context, const char * url, u32 * size, bool gitapi)
 {
 	Result ret = 0;
 	u32 statuscode = 0;
@@ -20,11 +23,28 @@ Result setupContext(httpcContext * context, const char * url, u32 * size)
 		return ret;
 	}
 	
-	ret = httpcSetSSLOpt(context, SSLCOPT_DisableVerify);
-	if (ret != 0) {
-		printf("Error in:\nhttpcSetSSLOpt\n");
-		httpcCloseContext(context);
-		return ret;
+	if (gitapi) {
+		ret = httpcAddTrustedRootCA(context, cybertrust_cer, cybertrust_cer_len);
+		if (ret != 0) {
+			printf("Error in:\nhttpcAddRequestHeaderField\n");
+			httpcCloseContext(context);
+			return ret;
+		}
+		
+		ret = httpcAddTrustedRootCA(context, digicert_cer, digicert_cer_len);
+		if (ret != 0) {
+			printf("Error in:\nhttpcAddRequestHeaderField\n");
+			httpcCloseContext(context);
+			return ret;
+		}
+	}
+	else {
+		ret = httpcSetSSLOpt(context, SSLCOPT_DisableVerify);
+		if (ret != 0) {
+			printf("Error in:\nhttpcSetSSLOpt\n");
+			httpcCloseContext(context);
+			return ret;
+		}
 	}
 	
 	ret = httpcAddRequestHeaderField(context, "Connection", "Keep-Alive");
@@ -77,8 +97,10 @@ Result setupContext(httpcContext * context, const char * url, u32 * size)
 			free(domainname);
 		}
 		
-		printf("Redirecting to url:\n%s\n", newurl);
-		ret = setupContext(context, newurl, size);
+		if (gitapi) printf("Redirecting...\n");
+		else printf("Redirecting to url:\n%s\n", newurl);
+		
+		ret = setupContext(context, newurl, size, gitapi);
 		free(newurl);
 		return ret;
 	}
@@ -99,7 +121,7 @@ Result setupContext(httpcContext * context, const char * url, u32 * size)
 	return 0;
 }
 
-Result downloadToFile(const char * url, const char * filepath)
+Result downloadToFile(const char * url, const char * filepath, bool gitapi)
 {
 	if (url == NULL) {
 		printf("Download cannot start, the URL in config.json is blank.\n");
@@ -117,7 +139,7 @@ Result downloadToFile(const char * url, const char * filepath)
 	Result ret = 0;
 	u32 contentsize = 0, readsize = 0;
 	
-	ret = setupContext(&context, url, &contentsize);
+	ret = setupContext(&context, url, &contentsize, gitapi);
 	if (ret != 0) return ret;
 	
 	printf("Downloading %lu bytes...\n", contentsize);
@@ -194,7 +216,7 @@ Result downloadFromRelease(const char * url, const char * element, const char * 
 	Result ret = 0;
 	u32 contentsize = 0, readsize = 0;
 	
-	ret = setupContext(&context, apiurl, &contentsize);
+	ret = setupContext(&context, apiurl, &contentsize, true);
 	if (ret != 0) return ret;
 	
 	char * buf = malloc(contentsize+1);
@@ -223,7 +245,7 @@ Result downloadFromRelease(const char * url, const char * element, const char * 
 	if (asseturl == NULL)
 		ret = DL_ERROR_GIT;
 	else {
-		ret = downloadToFile(asseturl, filepath);
+		ret = downloadToFile(asseturl, filepath, true);
 		free(asseturl);
 	}
 	
