@@ -7,7 +7,7 @@
 #define NAME_STRING "name"
 #define URL_STRING "url"
 #define PATH_STRING "path"
-#define IN_ZIP_STRING "inzip"
+#define IN_ARCHIVE_STRING "in_archive"
 #define IN_RELEASE_STRING "inrelease"
 
 void parse_entries(json_t * entries_elem, config_t * todo_config)
@@ -37,9 +37,9 @@ void parse_entries(json_t * entries_elem, config_t * todo_config)
 						{
 							todo_config->entries[i].path = strdup(json_string_value(value));
 						}
-						else if(!strcmp(key, IN_ZIP_STRING))
+						else if(!strcmp(key, IN_ARCHIVE_STRING))
 						{
-							todo_config->entries[i].in_zip = strdup(json_string_value(value));
+							todo_config->entries[i].in_archive = strdup(json_string_value(value));
 						}
 						else if(!strcmp(key, IN_RELEASE_STRING))
 						{
@@ -123,7 +123,7 @@ void clean_config(config_t * parsed_config)
 		free((char*)(parsed_config->entries[i].name));
 		free((char*)(parsed_config->entries[i].url));
 		free((char*)(parsed_config->entries[i].path));
-		free((char*)(parsed_config->entries[i].in_zip));
+		free((char*)(parsed_config->entries[i].in_archive));
 		free((char*)(parsed_config->entries[i].in_release));
 	}
 }
