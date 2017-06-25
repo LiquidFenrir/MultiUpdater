@@ -3,6 +3,27 @@
 #include "file.h"
 #include "cia.h"
 
+void cleanPath(char * path)
+{
+	for (int i = 0; path[i]; i++) { //replace all spaces and fat32 reserved characters in the path with underscores 
+		switch (path[i]) {
+			case ' ':
+			case '"':
+			case '/':
+			case '*':
+			case ':':
+			case '<':
+			case '>':
+			case '?':
+			case '\\':
+			case '|':
+				path[i] = '_';
+			default:
+				break;
+		}
+	}
+}
+
 u8 update(entry_t entry)
 {
 	Result ret = 0;
@@ -16,23 +37,7 @@ u8 update(entry_t entry)
 	//otherwise, download to an archive in the working dir, then extract where wanted
 	else {
 		sprintf(dl_path, "%s%s.archive", WORKING_DIR, entry.name);
-		for (int i = 0; dl_path[i]; i++) { //replace all spaces and fat32 reserved characters in the path with underscores 
-			switch (dl_path[i]) {
-				case ' ':
-				case '"':
-				case '/':
-				case '*':
-				case ':':
-				case '<':
-				case '>':
-				case '?':
-				case '\\':
-				case '|':
-					dl_path[i] = '_';
-				default:
-					break;
-			}
-}
+		cleanPath(dl_path);
 	}
 	
 	//if the entry doesnt want anything from a release, expect it to be a normal file
@@ -165,9 +170,7 @@ int main()
 					if (i == selected_entry || state[i] & STATE_MARKED) {
 						char backuppath[256];
 						sprintf(backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
-						for (u8 i = 0; backuppath[i]; i++) { //replace all spaces in the path with underscores 
-							if ((u8 )backuppath[i] == 0x20) backuppath[i] = 0x5F;
-						}
+						cleanPath(backuppath);
 						printf("\x1b[40;32mBacking up %s...\x1b[0m\n", parsed_config.entries[i].name);
 						
 						Result ret = copyFile(parsed_config.entries[i].path, backuppath);
@@ -186,9 +189,7 @@ int main()
 					if (i == selected_entry || state[i] & STATE_MARKED) {
 						char backuppath[256];
 						sprintf(backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
-						for (u8 i = 0; backuppath[i]; i++) { //replace all spaces in the path with underscores 
-							if ((u8 )backuppath[i] == 0x20) backuppath[i] = 0x5F;
-						}
+						cleanPath(backuppath);
 						printf("\x1b[40;Restoring %s...\x1b[0m\n", parsed_config.entries[i].name);
 						
 						Result ret = copyFile(backuppath, parsed_config.entries[i].path);
