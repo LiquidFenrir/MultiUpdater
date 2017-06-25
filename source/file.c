@@ -1,4 +1,5 @@
 #include "file.h"
+#include "stringutils.h"
 
 #include "minizip/unzip.h"
 
@@ -125,7 +126,7 @@ Result extractFileFrom7z(const char * archive_file, const char * filename, const
 		size_t offset = 0;
 		size_t fileSize = 0;
 
-		if (!strcmp(name8, filename)) {
+		if (!matchPattern(filename, name8)) {
 			res = SzArEx_Extract(
 						&db,
 						&memStream.s,
@@ -159,6 +160,7 @@ Result extractFileFrom7z(const char * archive_file, const char * filename, const
 		}
 	}
 	
+	printf("Couldn't find a file with a name matching %s in the archive.\n", filename);
 	ret = EXTRACTION_ERROR_FIND;
 	
 	finish:
@@ -166,6 +168,11 @@ Result extractFileFrom7z(const char * archive_file, const char * filename, const
 	fclose(archive);
 	
 	return ret;
+}
+
+static int unzipMatchPattern(__attribute__ ((unused)) unzFile file, const char *filename1, const char *filename2)
+{
+	return matchPattern(filename2, filename1);
 }
 
 Result extractFileFromZip(const char * archive_file, const char * filename, const char * filepath)
@@ -199,7 +206,7 @@ Result extractFileFromZip(const char * archive_file, const char * filename, cons
 	
 	unz_file_info payloadInfo = {};
 	
-	ret = unzLocateFile(uf, filename, NULL);
+	ret = unzLocateFile(uf, filename, &unzipMatchPattern);
 
 	if (ret == UNZ_END_OF_LIST_OF_FILE) {
 		printf("Couldn't find the wanted file in the zip.\n");
@@ -222,6 +229,7 @@ Result extractFileFromZip(const char * archive_file, const char * filename, cons
 		
 		ret = unzOpenCurrentFile(uf);
 		if (ret != UNZ_OK) {
+			printf("Couldn't open file in the archive to read\n");
 			ret = EXTRACTION_ERROR_OPEN_IN_ARCHIVE;
 			goto finish;
 		}
@@ -236,6 +244,7 @@ Result extractFileFromZip(const char * archive_file, const char * filename, cons
 				ret = 0;
 			}
 			else {
+				printf("Couldn't read data from the file in the archive\n");
 				ret = EXTRACTION_ERROR_READ_IN_ARCHIVE;
 				goto finish;
 			}

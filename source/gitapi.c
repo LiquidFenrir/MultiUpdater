@@ -1,35 +1,8 @@
 #include "gitapi.h"
+#include "stringutils.h"
 
-int matchPattern(const char * pattern, const char * str) {
-	int p_offset = 0, s_offset = 0;
-	char current_p_char = '\0', current_s_char = '\0', next_p_char = '\0';
-
-	while (str[s_offset] != '\0') {
-		current_p_char = pattern[p_offset];
-		current_s_char = str[s_offset];
-		if (current_p_char == '*' && next_p_char == '\0') {
-			next_p_char = pattern[p_offset+1];
-		}
-		if (next_p_char != '\0') {
-			if (current_s_char != next_p_char) {
-				s_offset++;
-				continue;
-			}
-			else {
-				current_p_char = next_p_char;
-				p_offset++;
-				next_p_char = '\0';
-			}
-		}
-		if (current_p_char != current_s_char) return 1;
-		
-		s_offset++;
-		p_offset++;
-	}
-	return (next_p_char != '\0');
-}
-
-char * findTagValue(const char * apiresponse, const char * tagname) {
+char * findTagValue(const char * apiresponse, const char * tagname)
+{
 	char * endstring = "\"";
 	char *tagstart, *tagend, *retstr = NULL;
 	
