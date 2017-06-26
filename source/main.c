@@ -191,14 +191,31 @@ int main()
 			gspWaitForVBlank();
 		}
 	}
-	else {
-		char * config_errors[] = {
-			"There is an error in your config.json.",
-			"The config.json could not be found."
-		};
+	else if (parsed_config.errorState == ERROR_FILE) {
 		
-		printf("\x1b[40;31m\x1b[13;2Herror");
-		printf("\x1b[13;2H%s", config_errors[parsed_config.errorState-1]);
+		printf("\x1b[40;31m\x1b[13;2HError: config file not found.\x1b[0m");
+		printf("\x1b[14;2HPress A to download the example config.json");
+		consoleSelect(&bottomScreen);
+		
+		while (aptMainLoop()) {
+			
+			hidScanInput();
+			if (hidKeysDown() & KEY_START) break;
+			else if (hidKeysDown() & KEY_A) {
+				printf("\x1b[40;34mDownloading example config.json...\x1b[0m\n");
+				Result ret = downloadToFile("https://raw.githubusercontent.com/LiquidFenrir/MultiUpdater/master/config.json" , filepath, true);
+				if (ret != 0) printf("\x1b[40;31mDownload failed!\nError: 0x%08x\x1b[0m\n", (unsigned int)ret);
+				else printf("\x1b[40;32mDownload successful!\x1b[0m\nYou can now restart the application and enjoy the multiple functions.\n");
+			}
+			
+			gfxFlushBuffers();
+			gfxSwapBuffers();
+			
+			gspWaitForVBlank();
+		}
+	}
+	else {
+		printf("\x1b[40;31m\x1b[13;2HError: invalid config.json.\x1b[0m");
 		while (aptMainLoop()) {
 			
 			hidScanInput();
