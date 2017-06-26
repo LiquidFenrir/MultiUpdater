@@ -30,6 +30,8 @@ RSF_PATH         :=  $(RESOURCES)/rominfo.rsf
 PRODUCT_CODE     :=  CTR-P-ULTI
 UNIQUE_ID        :=  0xd5c49
 
+LOGO             :=  $(RESOURCES)/logo.bcma.lz
+
 VERSION          :=  $(shell git describe --tags)
 
 NO_SMDH          :=  true
@@ -156,7 +158,7 @@ clean:
 MAKEROM	?=	makerom
 
 %.cia: $(OUTPUT).elf $(BUILD)/banner.bnr $(BUILD)/icon.icn
-	$(MAKEROM) -f cia -o "$@" -elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -target t -exefslogo -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(UNIQUE_ID)"
+	$(MAKEROM) -f cia -o "$@" -elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -logo "$(LOGO)" -target t -exefslogo -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(UNIQUE_ID)"
 
 # Banner
 
