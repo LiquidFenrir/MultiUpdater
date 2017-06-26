@@ -1,5 +1,6 @@
 #include "download.h"
 #include "gitapi.h"
+#include "file.h"
 
 #include "certs/cybertrust.h"
 #include "certs/digicert.h"
@@ -144,9 +145,14 @@ Result downloadToFile(const char * url, const char * filepath, bool gitapi)
 	
 	printf("Downloading %lu bytes...\n", contentsize);
 	
-	FILE * fh = fopen(filepath, "wb");
-	if (fh == NULL) {
+	Handle filehandle;
+	u64 offset = 0;
+	u32 bytesWritten = 0;
+	
+	ret = openFile(filepath, &filehandle, true);
+	if (ret != 0) {
 		printf("Error: couldn't open file to write.\n");
+		httpcCloseContext(&context);
 		return DL_ERROR_WRITEFILE;
 	}
 	
@@ -159,12 +165,13 @@ Result downloadToFile(const char * url, const char * filepath, bool gitapi)
 	u64 startTime = osGetTime();
 	do {
 		ret = httpcDownloadData(&context, buf, 0x1000, &readsize);
-		fwrite(buf, 1, readsize, fh);
+		writeFile(filehandle, &bytesWritten, offset, buf, readsize);
+		offset += readsize;
 	} while (ret == (Result)HTTPC_RESULTCODE_DOWNLOADPENDING);
 	printf("Download took %llu milliseconds.\n", osGetTime()-startTime);
 	
 	free(buf);
-	fclose(fh);
+	closeFile(filehandle);
 	httpcCloseContext(&context);
 	
 	if (ret != 0) {
