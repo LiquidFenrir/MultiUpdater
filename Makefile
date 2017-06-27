@@ -18,7 +18,7 @@ OUTDIR           :=  out
 BUILD            :=  build
 SOURCES          :=  source source/minizip source/7z
 INCLUDES         :=  include
-RESOURCES        :=  resources
+RESOURCES        :=  $(CURDIR)/resources
 
 ICON             :=  $(RESOURCES)/icon.png
 ICON_FLAGS       :=  visible,nosavebackups
@@ -33,8 +33,6 @@ UNIQUE_ID        :=  0xd5c49
 LOGO             :=  $(RESOURCES)/logo.bcma.lz
 
 VERSION          :=  $(shell git describe --tags)
-
-NO_SMDH          :=  true
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -143,6 +141,7 @@ $(BUILD):
 	@mkdir -p $(OUTDIR)
 	@[ -d "$@" ] || mkdir -p "$@"
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@rm -f "$(OUTPUT).smdh"
 
 #---------------------------------------------------------------------------------
 clean:
@@ -153,6 +152,7 @@ clean:
 %.zip:
 	@7z a -bso0 "$@" "$(OUTPUT).cia"  "$(OUTPUT).3dsx"
 	@7z rn -bso0 "$@" "$(TARGET).3dsx"  "3ds/$(TARGET)/$(TARGET).3dsx"
+
 #---------------------------------------------------------------------------------
 
 MAKEROM	?=	makerom
