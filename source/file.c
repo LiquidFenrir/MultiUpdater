@@ -214,7 +214,6 @@ Result extractFileFrom7z(const char * archive_file, const char * filename, const
 			
 			Handle filehandle;
 			u32 bytesWritten = 0;
-			u64 offset = 0;
 			
 			ret = openFile(filepath, &filehandle, true);
 			if (ret != 0) {
@@ -222,7 +221,7 @@ Result extractFileFrom7z(const char * archive_file, const char * filename, const
 				return EXTRACTION_ERROR_WRITEFILE;
 			}
 			
-			ret = writeFile(filehandle, &bytesWritten, offset, buf+offset, (u32)fileSize);
+			ret = writeFile(filehandle, &bytesWritten, 0, buf+offset, (u32)fileSize);
 			closeFile(filehandle);
 			
 			free(buf);
