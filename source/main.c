@@ -70,8 +70,13 @@ int main()
 	fsInit();
 	AM_InitializeExternalTitleDatabase(false);
 	
-	PrintConsole topScreen, bottomScreen;
+	PrintConsole topScreen, bottomScreen, menuWindow;
 	consoleInit(GFX_TOP, &topScreen);
+	consoleInit(GFX_TOP, &menuWindow);
+	consoleSetWindow(&menuWindow,
+	                 5,
+	                 5,
+	                 MENU_WIDTH, MENU_HEIGHT);
 	consoleInit(GFX_BOTTOM, &bottomScreen);
 
 	consoleSelect(&topScreen);
@@ -95,7 +100,8 @@ int main()
 		while (aptMainLoop()) {
 			
 			if (kDown) { //if keys were pressed last frame, you will have to redraw the menu (most probably)
-				consoleSelect(&topScreen);
+				consoleSelect(&menuWindow);
+				// consoleClear();
 				drawMenu(&parsed_config, state, selected_entry);
 				consoleSelect(&bottomScreen);
 			}
