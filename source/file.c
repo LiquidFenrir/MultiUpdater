@@ -311,14 +311,14 @@ Result extractFileFromZip(const char * archive_file, const char * filename, cons
 		do {
 			if (size < toRead) toRead = size;
 			ret = unzReadCurrentFile(uf, buf, toRead);
-			if (ret > 0) {
-				ret = writeFile(filehandle, &bytesWritten, offset, buf, toRead);
-				offset += toRead;
-			}
-			else {
+			if (ret < 0) {
 				printf("Couldn't read data from the file in the archive\n");
 				ret = EXTRACTION_ERROR_READ_IN_ARCHIVE;
 				goto finish;
+			}
+			else {
+				ret = writeFile(filehandle, &bytesWritten, offset, buf, toRead);
+				offset += toRead;
 			}
 			size -= toRead;
 		} while(size);
