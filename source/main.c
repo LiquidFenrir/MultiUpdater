@@ -89,53 +89,58 @@ int main()
 		
 		u8 selected_entry = 0;
 		u8 state[256] = {0};
+		//draw the menu, if it was 0 the user would have to press a key before it gets drawn for the first time
+		u32 kDown = 1;
 		
 		while (aptMainLoop()) {
-
-			consoleSelect(&topScreen);
-			drawMenu(&parsed_config, state, selected_entry);
-			consoleSelect(&bottomScreen);
+			
+			if (kDown) { //if keys were pressed last frame, you will have to redraw the menu (most probably)
+				consoleSelect(&topScreen);
+				drawMenu(&parsed_config, state, selected_entry);
+				consoleSelect(&bottomScreen);
+			}
 			
 			hidScanInput();
+			kDown = hidKeysDown();
 			
-			if (hidKeysDown() & KEY_START) {
+			if (kDown & KEY_START) {
 				//strings copied with strdup need to be freed
 				clean_config(&parsed_config);
 				break;
 			}
-			else if (hidKeysDown() & KEY_SELECT) {
+			else if (kDown & KEY_SELECT) {
 				drawInstructions();
 			}
-			else if (hidKeysDown() & KEY_DOWN) {
+			else if (kDown & KEY_DOWN) {
 				selected_entry++;
 				if (selected_entry >= parsed_config.entries_number)
 					selected_entry = parsed_config.entries_number-1;
 			}
-			else if (hidKeysDown() & KEY_UP) {
+			else if (kDown & KEY_UP) {
 				selected_entry--;
 				if (selected_entry >= parsed_config.entries_number)
 					selected_entry = 0;
 			}
-			else if (hidKeysDown() & KEY_RIGHT) { //go to bottom of the menu
+			else if (kDown & KEY_RIGHT) { //go to bottom of the menu
 				selected_entry = parsed_config.entries_number-1;
 			}
-			else if (hidKeysDown() & KEY_LEFT) { //go to top of the menu
+			else if (kDown & KEY_LEFT) { //go to top of the menu
 				selected_entry = 0;
 			}
-			else if (hidKeysDown() & KEY_L) { //mark all entries
+			else if (kDown & KEY_L) { //mark all entries
 				for (u8 i = 0; i < parsed_config.entries_number; i++) {
 					state[i] |= STATE_MARKED;
 				}
 			}
-			else if (hidKeysDown() & KEY_R) { //unmark all entries
+			else if (kDown & KEY_R) { //unmark all entries
 				for (u8 i = 0; i < parsed_config.entries_number; i++) {
 					state[i] &= ~STATE_MARKED;
 				}
 			}
-			else if (hidKeysDown() & KEY_Y) { //mark/unmark selected entry
+			else if (kDown & KEY_Y) { //mark/unmark selected entry
 				state[selected_entry] ^= STATE_MARKED;
 			}
-			else if (hidKeysDown() & KEY_A) { //update all marked entries and currently selected entry (even if it's not marked)
+			else if (kDown & KEY_A) { //update all marked entries and currently selected entry (even if it's not marked)
 				for (u8 i = 0; i < parsed_config.entries_number; i++) {
 					if (i == selected_entry || state[i] & STATE_MARKED) {
 						u8 ret = update(parsed_config.entries[i]);
@@ -145,7 +150,7 @@ int main()
 					}
 				}
 			}
-			else if (hidKeysDown() & KEY_B) { //backup all marked entries and currently selected entry (even if it's not marked)
+			else if (kDown & KEY_B) { //backup all marked entries and currently selected entry (even if it's not marked)
 				for (u8 i = 0; i < parsed_config.entries_number; i++) {
 					if (i == selected_entry || state[i] & STATE_MARKED) {
 						char backuppath[256];
@@ -164,7 +169,7 @@ int main()
 					}
 				}
 			}
-			else if (hidKeysDown() & KEY_X) { //restore the backups of all marked entries and currently selected entry (even if it's not marked)
+			else if (kDown & KEY_X) { //restore the backups of all marked entries and currently selected entry (even if it's not marked)
 				for (u8 i = 0; i < parsed_config.entries_number; i++) {
 					if (i == selected_entry || state[i] & STATE_MARKED) {
 						char backuppath[256];
