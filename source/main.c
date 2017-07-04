@@ -3,6 +3,7 @@
 #include "file.h"
 #include "cia.h"
 #include "stringutils.h"
+#include "params.h"
 
 u8 update(entry_t entry)
 {
@@ -78,11 +79,26 @@ int main()
 	printf("\x1b[2;2HMultiUpdater %s by LiquidFenrir", VERSION_STRING);
 	printf("\x1b[27;2HPress SELECT to show instructions.");
 	printf("\x1b[28;2HPress START to exit.\x1b[0;0H");
+	
+	config_t parsed_config;
+	if (handleParams(&parsed_config.entries[0])) {
+		consoleSelect(&bottomScreen);
+		printf("\x1b[40;33mUpdating requested application:\n%s\n\x1b[0m", parsed_config.entries[0].name);
+		update(parsed_config.entries[0]);
+		printf("\n\x1b[40;33mClosing in 10 seconds.\nTake note of error codes if needed...\n\x1b[0m");
+		
+		gfxFlushBuffers();
+		gfxSwapBuffers();
+		gspWaitForVBlank();
+		
+		svcSleepThread(10e9);
+		parsed_config.entries_number = 1;
+		goto exit;
+	}
 
 	char filepath[256];
 	sprintf(filepath, "%sconfig.json", WORKING_DIR);
 
-	config_t parsed_config;
 	get_config(filepath, &parsed_config);
 
 	if (parsed_config.errorState == 0) {
@@ -99,6 +115,7 @@ int main()
 			hidScanInput();
 			
 			if (hidKeysDown() & KEY_START) {
+				exit:
 				//strings copied with strdup need to be freed
 				clean_config(&parsed_config);
 				break;
