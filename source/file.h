@@ -23,7 +23,7 @@ inline Result writeFile(Handle filehandle, u32 * bytesWritten, u64 offset, void 
 }
 inline Result closeFile(Handle filehandle)
 {
-	return svcCloseHandle(filehandle);
+	return FSFILE_Close(filehandle);
 }
 
 Result copyFile(const char * srcpath, const char * destpath);
