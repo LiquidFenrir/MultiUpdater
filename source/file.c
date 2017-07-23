@@ -44,6 +44,7 @@ Result openFile(const char * path, Handle * filehandle, bool write)
 	u32 flags = (write ? (FS_OPEN_CREATE | FS_OPEN_WRITE) : FS_OPEN_READ);
 	FS_Path filePath = {0};
 	int prefixlen = 0;
+	Result ret = 0;
 	
 	if (!strncmp(path, "ctrnand:/", 9)) {
 		archive = (FS_Archive){ARCHIVE_NAND_CTR_FS};
@@ -72,8 +73,10 @@ Result openFile(const char * path, Handle * filehandle, bool write)
 	if (filePath.size == 0) filePath = fsMakePath(PATH_ASCII, path+prefixlen);
 	
 	makeDirs(archive, filePath);
-	Result ret = FSUSER_OpenFileDirectly(filehandle, archive, emptyPath, filePath, flags, 0);
+	ret = FSUSER_OpenFileDirectly(filehandle, archive, emptyPath, filePath, flags, 0);
 	if (ret != 0) printf("Error in:\nFSUSER_OpenFileDirectly\nError: 0x%08x\n", (unsigned int)ret);
+	if (write) ret = FSFILE_SetSize(*filehandle, 0); //truncate the file to remove previous contents before writing
+	if (ret != 0) printf("Error in:\nFSFILE_SetSize\nError: 0x%08x\n", (unsigned int)ret);
 	
 	return ret;
 }
