@@ -2,7 +2,7 @@
 
 #define MENU_WIDTH 40
 #define MAX_ENTRIES_PER_SCREEN 18
-u8 scroll = 0;
+int scroll = 0;
 
 void drawInstructions()
 {
@@ -16,29 +16,28 @@ void drawInstructions()
 	       "Press [R] to unmark all entries.\x1b[0m\n");
 }
 
-void drawMenu(config_t * parsed_config, u8 * state, u8 selected_entry)
+void drawMenu(config_t * parsed_config, u8 * state, int selected_entry)
 {
-	if (selected_entry == 0) {
-		scroll = 0;
-	}
-	else if(selected_entry == parsed_config->entries_number-1) {
-		scroll = parsed_config->entries_number - MAX_ENTRIES_PER_SCREEN;
-		if (scroll >= parsed_config->entries_number)
-			scroll = 0;
-	}
-	else if (selected_entry >= (MAX_ENTRIES_PER_SCREEN + scroll)) {
-		scroll++;
-	}
-	else if ((selected_entry - scroll) < 0) {
-		scroll--;
+	int i;
+	
+	for (i = 0; i < parsed_config->entries_number; i++) {
+		if (parsed_config->entries_number <= MAX_ENTRIES_PER_SCREEN) break;
+		
+		if (scroll > selected_entry) {
+			scroll--;
+		}
+		
+		if (i < selected_entry && selected_entry-scroll >= MAX_ENTRIES_PER_SCREEN && scroll != parsed_config->entries_number-MAX_ENTRIES_PER_SCREEN) {
+			scroll++;
+		}
 	}
 	
-	for (u8 i = 0; i <= 40; i++) {
-		printf("\x1b[0;40;37m\x1b[5;%uH=", (4+i));
-		printf("\x1b[0;40;37m\x1b[24;%uH=", (4+i));
+	for (i = 0; i <= 40; i++) {
+		printf("\x1b[0;40;37m\x1b[%u;%uH=", 5, (4+i));
+		printf("\x1b[0;40;37m\x1b[%u;%uH=", 5+MAX_ENTRIES_PER_SCREEN+1, (4+i));
 	}
 	
-	for(u8 i = scroll; i < (MAX_ENTRIES_PER_SCREEN + scroll); i++) {
+	for(i = scroll; i < (MAX_ENTRIES_PER_SCREEN + scroll); i++) {
 		
 		char * current_name = (char *)parsed_config->entries[i].name;
 		

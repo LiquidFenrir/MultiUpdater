@@ -103,7 +103,7 @@ int main()
 
 	if (parsed_config.errorState == 0) {
 		
-		u8 selected_entry = 0;
+		int selected_entry = 0;
 		u8 state[256] = {0};
 		
 		while (aptMainLoop()) {
@@ -130,7 +130,7 @@ int main()
 			}
 			else if (hidKeysDown() & KEY_UP) {
 				selected_entry--;
-				if (selected_entry >= parsed_config.entries_number)
+				if (selected_entry < 0)
 					selected_entry = 0;
 			}
 			else if (hidKeysDown() & KEY_RIGHT) { //go to bottom of the menu
@@ -153,18 +153,33 @@ int main()
 				state[selected_entry] ^= STATE_MARKED;
 			}
 			else if (hidKeysDown() & KEY_A) { //update all marked entries and currently selected entry (even if it's not marked)
-				for (u8 i = 0; i < parsed_config.entries_number; i++) {
+				int selected_entry_bak = selected_entry;
+				for (int i = 0; i < parsed_config.entries_number; i++) {
 					if (i == selected_entry || state[i] & STATE_MARKED) {
+						consoleSelect(&topScreen);
+						drawMenu(&parsed_config, state, i);
+						consoleSelect(&bottomScreen);
+						
 						u8 ret = update(parsed_config.entries[i]);
 						printf("\x1b[0m\n");
 						state[i] |= ret;
 						state[i] &= ~STATE_MARKED;
+						
+						gfxFlushBuffers();
+						gfxSwapBuffers();
+						gspWaitForVBlank();
 					}
 				}
+				selected_entry = selected_entry_bak;
 			}
 			else if (hidKeysDown() & KEY_B) { //backup all marked entries and currently selected entry (even if it's not marked)
-				for (u8 i = 0; i < parsed_config.entries_number; i++) {
+				int selected_entry_bak = selected_entry;
+				for (int i = 0; i < parsed_config.entries_number; i++) {
 					if (i == selected_entry || state[i] & STATE_MARKED) {
+						consoleSelect(&topScreen);
+						drawMenu(&parsed_config, state, i);
+						consoleSelect(&bottomScreen);
+						
 						char backuppath[256];
 						sprintf(backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
 						cleanPath(backuppath);
@@ -178,12 +193,22 @@ int main()
 							printf("\x1b[40;32mBackup complete!");
 						}
 						printf("\x1b[0m\n");
+						
+						gfxFlushBuffers();
+						gfxSwapBuffers();
+						gspWaitForVBlank();
 					}
 				}
+				selected_entry = selected_entry_bak;
 			}
 			else if (hidKeysDown() & KEY_X) { //restore the backups of all marked entries and currently selected entry (even if it's not marked)
-				for (u8 i = 0; i < parsed_config.entries_number; i++) {
+				int selected_entry_bak = selected_entry;
+				for (int i = 0; i < parsed_config.entries_number; i++) {
 					if (i == selected_entry || state[i] & STATE_MARKED) {
+						consoleSelect(&topScreen);
+						drawMenu(&parsed_config, state, i);
+						consoleSelect(&bottomScreen);
+						
 						char backuppath[256];
 						sprintf(backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
 						cleanPath(backuppath);
@@ -198,8 +223,13 @@ int main()
 							remove(backuppath);
 						}
 						printf("\x1b[0m\n");
+						
+						gfxFlushBuffers();
+						gfxSwapBuffers();
+						gspWaitForVBlank();
 					}
 				}
+				selected_entry = selected_entry_bak;
 			}
 			
 			gfxFlushBuffers();

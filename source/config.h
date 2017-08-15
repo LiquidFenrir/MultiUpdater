@@ -12,7 +12,7 @@ typedef struct {
 
 typedef struct {
 	u8 errorState;
-	u8 entries_number;
+	int entries_number;
 	entry_t entries[256];
 } config_t;
 
