@@ -1,5 +1,4 @@
 #include <jansson.h>
-#include <malloc.h>
 #include "config.h"
 
 #define ENTRIES_STRING "entries"

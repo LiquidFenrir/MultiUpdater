@@ -8,7 +8,7 @@
 u8 update(entry_t entry)
 {
 	Result ret = 0;
-	printf("\x1b[40;34mBeginning update...\x1b[0m\n");
+	printf_log("\x1b[40;34mBeginning update...\x1b[0m\n");
 	
 	char dl_path[256] = {0};
 	
@@ -28,38 +28,38 @@ u8 update(entry_t entry)
 		ret = downloadFromRelease(entry.url, entry.in_release, dl_path);
 	
 	if (ret != 0) {
-		printf("\x1b[40;31mDownload failed!");
+		printf_log("\x1b[40;31mDownload failed!");
 		goto failure;
 	}
-	else printf("\x1b[40;32mDownload successful!");
+	else printf_log("\x1b[40;32mDownload successful!");
 	
 	if (entry.in_archive != NULL) {
-		printf("\n\x1b[40;34mExtracting file from the archive...\x1b[0m\n");
+		printf_log("\n\x1b[40;34mExtracting file from the archive...\x1b[0m\n");
 		ret = extractFileFromArchive(dl_path, entry.in_archive, entry.path);
 		if (ret != 0) {
-			printf("\x1b[40;31mExtraction failed!");
+			printf_log("\x1b[40;31mExtraction failed!");
 			goto failure;
 		}
-		else printf("\x1b[40;32mExtraction successful!");
+		else printf_log("\x1b[40;32mExtraction successful!");
 	}
 	
 	//if the extracted/downloaded file ends with ".cia", try to install it
 	if (strncmp(entry.path+strlen(entry.path)-4, ".cia", 4) == 0) {
-		printf("\n\x1b[40;34mInstalling CIA...\x1b[0m\n");
+		printf_log("\n\x1b[40;34mInstalling CIA...\x1b[0m\n");
 		ret = installCia(entry.path);
 		if (ret != 0) {
-			printf("\x1b[40;31mInstall failed!");
+			printf_log("\x1b[40;31mInstall failed!");
 			goto failure;
 		}
 		else
-			printf("\x1b[40;32mInstall successful!");
+			printf_log("\x1b[40;32mInstall successful!");
 	}
 	
-	printf("\n\x1b[40;32mUpdate complete!");
+	printf_log("\n\x1b[40;32mUpdate complete!");
 	return UPDATE_DONE;
 	
 	failure:
-	printf("\nError: 0x%08x", (unsigned int)ret);
+	printf_log("\nError: 0x%08x", (unsigned int)ret);
 	return UPDATE_ERROR;
 }
 
@@ -74,18 +74,23 @@ int main()
 	PrintConsole topScreen, bottomScreen;
 	consoleInit(GFX_TOP, &topScreen);
 	consoleInit(GFX_BOTTOM, &bottomScreen);
-
+	
+	asprintf(&log_file_path, "%s%s", WORKING_DIR, LOGFILE_NAME);
+	Handle fileHandle;
+	openFile(log_file_path, &fileHandle, true);
+	closeFile(fileHandle);
+	
 	consoleSelect(&topScreen);
-	printf("\x1b[2;2HMultiUpdater %s by LiquidFenrir", VERSION_STRING);
+	printf_log("\x1b[2;2HMultiUpdater %s by LiquidFenrir", VERSION_STRING);
 	printf("\x1b[27;2HPress SELECT to show instructions.");
 	printf("\x1b[28;2HPress START to exit.\x1b[0;0H");
 	
 	config_t parsed_config;
 	if (handleParams(&parsed_config.entries[0])) {
 		consoleSelect(&bottomScreen);
-		printf("\x1b[40;33mUpdating requested application:\n%s\n\x1b[0m", parsed_config.entries[0].name);
+		printf_log("\x1b[40;33mUpdating requested application:\n%s\n\x1b[0m", parsed_config.entries[0].name);
 		update(parsed_config.entries[0]);
-		printf("\n\x1b[40;33mClosing in 10 seconds.\nTake note of error codes if needed...\n\x1b[0m");
+		printf_log("\n\x1b[40;33mClosing in 10 seconds.\nTake note of error codes if needed...\n\x1b[0m");
 		
 		gfxFlushBuffers();
 		gfxSwapBuffers();
@@ -161,7 +166,7 @@ int main()
 						consoleSelect(&bottomScreen);
 						
 						u8 ret = update(parsed_config.entries[i]);
-						printf("\x1b[0m\n");
+						printf_log("\x1b[0m\n");
 						state[i] |= ret;
 						state[i] &= ~STATE_MARKED;
 						
@@ -183,16 +188,16 @@ int main()
 						char * backuppath = NULL;
 						asprintf(&backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
 						cleanPath(backuppath);
-						printf("\x1b[40;32mBacking up %s...\x1b[0m\n", parsed_config.entries[i].name);
+						printf_log("\x1b[40;32mBacking up %s...\x1b[0m\n", parsed_config.entries[i].name);
 						
 						Result ret = copyFile(parsed_config.entries[i].path, backuppath);
 						if (ret != 0) {
-							printf("\x1b[40;31mBackup failed...");
+							printf_log("\x1b[40;31mBackup failed...");
 						}
 						else {
-							printf("\x1b[40;32mBackup complete!");
+							printf_log("\x1b[40;32mBackup complete!");
 						}
-						printf("\x1b[0m\n");
+						printf_log("\x1b[0m\n");
 						
 						free(backuppath);
 						
@@ -214,17 +219,17 @@ int main()
 						char * backuppath = NULL;
 						asprintf(&backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
 						cleanPath(backuppath);
-						printf("\x1b[40;Restoring %s...\x1b[0m\n", parsed_config.entries[i].name);
+						printf_log("\x1b[40;Restoring %s...\x1b[0m\n", parsed_config.entries[i].name);
 						
 						Result ret = copyFile(backuppath, parsed_config.entries[i].path);
 						if (ret != 0) {
-							printf("\x1b[40;31mRestore failed...");
+							printf_log("\x1b[40;31mRestore failed...");
 						}
 						else {
-							printf("\x1b[40;32mRestore complete!");
+							printf_log("\x1b[40;32mRestore complete!");
 							remove(backuppath);
 						}
-						printf("\x1b[0m\n");
+						printf_log("\x1b[0m\n");
 						
 						free(backuppath);
 						
@@ -238,13 +243,12 @@ int main()
 			
 			gfxFlushBuffers();
 			gfxSwapBuffers();
-			
 			gspWaitForVBlank();
 		}
 	}
 	else if (parsed_config.errorState == ERROR_FILE) {
 		
-		printf("\x1b[40;31m\x1b[13;2HError: config file not found.\x1b[0m");
+		printf_log("\x1b[40;31m\x1b[13;2HError: config file not found.\x1b[0m");
 		printf("\x1b[14;2HPress A to download the example config.json");
 		consoleSelect(&bottomScreen);
 		
@@ -253,20 +257,19 @@ int main()
 			hidScanInput();
 			if (hidKeysDown() & KEY_START) break;
 			else if (hidKeysDown() & KEY_A) {
-				printf("\x1b[40;34mDownloading example config.json...\x1b[0m\n");
+				printf_log("\x1b[40;34mDownloading example config.json...\x1b[0m\n");
 				Result ret = downloadToFile("https://raw.githubusercontent.com/LiquidFenrir/MultiUpdater/master/config.json" , filepath, true);
-				if (ret != 0) printf("\x1b[40;31mDownload failed!\nError: 0x%08x\x1b[0m\n", (unsigned int)ret);
-				else printf("\x1b[40;32mDownload successful!\x1b[0m\nYou can now restart the application and enjoy the multiple functions.\n");
+				if (ret != 0) printf_log("\x1b[40;31mDownload failed!\nError: 0x%08x\x1b[0m\n", (unsigned int)ret);
+				else printf_log("\x1b[40;32mDownload successful!\x1b[0m\nYou can now restart the application and enjoy the multiple functions.\n");
 			}
 			
 			gfxFlushBuffers();
 			gfxSwapBuffers();
-			
 			gspWaitForVBlank();
 		}
 	}
 	else {
-		printf("\x1b[40;31m\x1b[13;2HError: invalid config.json.\x1b[0m");
+		printf_log("\x1b[40;31m\x1b[13;2HError: invalid config.json.\x1b[0m");
 		while (aptMainLoop()) {
 			
 			hidScanInput();
@@ -278,6 +281,8 @@ int main()
 			gspWaitForVBlank();
 		}
 	}
+	
+	free(log_file_path);
 	
 	fsExit();
 	amExit();

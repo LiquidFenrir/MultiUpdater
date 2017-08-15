@@ -12,14 +12,14 @@ Result setupContext(httpcContext * context, const char * url, u32 * size, bool g
 	
 	ret = httpcOpenContext(context, HTTPC_METHOD_GET, url, 1);
 	if (ret != 0) {
-		printf("Error in:\nhttpcOpenContext\n");
+		printf_log("Error in:\nhttpcOpenContext\n");
 		httpcCloseContext(context);
 		return ret;
 	}
 	
 	ret = httpcAddRequestHeaderField(context, "User-Agent", "MultiUpdater");
 	if (ret != 0) {
-		printf("Error in:\nhttpcAddRequestHeaderField\n");
+		printf_log("Error in:\nhttpcAddRequestHeaderField\n");
 		httpcCloseContext(context);
 		return ret;
 	}
@@ -27,14 +27,14 @@ Result setupContext(httpcContext * context, const char * url, u32 * size, bool g
 	if (gitapi) {
 		ret = httpcAddTrustedRootCA(context, cybertrust_cer, cybertrust_cer_len);
 		if (ret != 0) {
-			printf("Error in:\nhttpcAddRequestHeaderField\n");
+			printf_log("Error in:\nhttpcAddRequestHeaderField\n");
 			httpcCloseContext(context);
 			return ret;
 		}
 		
 		ret = httpcAddTrustedRootCA(context, digicert_cer, digicert_cer_len);
 		if (ret != 0) {
-			printf("Error in:\nhttpcAddRequestHeaderField\n");
+			printf_log("Error in:\nhttpcAddRequestHeaderField\n");
 			httpcCloseContext(context);
 			return ret;
 		}
@@ -42,7 +42,7 @@ Result setupContext(httpcContext * context, const char * url, u32 * size, bool g
 	else {
 		ret = httpcSetSSLOpt(context, SSLCOPT_DisableVerify);
 		if (ret != 0) {
-			printf("Error in:\nhttpcSetSSLOpt\n");
+			printf_log("Error in:\nhttpcSetSSLOpt\n");
 			httpcCloseContext(context);
 			return ret;
 		}
@@ -50,21 +50,21 @@ Result setupContext(httpcContext * context, const char * url, u32 * size, bool g
 	
 	ret = httpcAddRequestHeaderField(context, "Connection", "Keep-Alive");
 	if (ret != 0) {
-		printf("Error in:\nhttpcAddRequestHeaderField\n");
+		printf_log("Error in:\nhttpcAddRequestHeaderField\n");
 		httpcCloseContext(context);
 		return ret;
 	}
 	
 	ret = httpcBeginRequest(context);
 	if (ret != 0) {
-		printf("Error in:\nhttpcBeginRequest\n");
+		printf_log("Error in:\nhttpcBeginRequest\n");
 		httpcCloseContext(context);
 		return ret;
 	}
 	
 	ret = httpcGetResponseStatusCode(context, &statuscode);
 	if (ret != 0) {
-		printf("Error in:\nhttpcGetResponseStatusCode\n");
+		printf_log("Error in:\nhttpcGetResponseStatusCode\n");
 		httpcCloseContext(context);
 		return ret;
 	}
@@ -78,7 +78,7 @@ Result setupContext(httpcContext * context, const char * url, u32 * size, bool g
 		
 		ret = httpcGetResponseHeader(context, "Location", newurl, 0x1000);
 		if (ret != 0) {
-			printf("Error in:\nhttpcGetResponseHeader\n");
+			printf_log("Error in:\nhttpcGetResponseHeader\n");
 			httpcCloseContext(context);
 			free(newurl);
 			return ret;
@@ -98,8 +98,8 @@ Result setupContext(httpcContext * context, const char * url, u32 * size, bool g
 			free(domainname);
 		}
 		
-		if (gitapi) printf("Redirecting...\n");
-		else printf("Redirecting to url:\n%s\n", newurl);
+		if (gitapi) printf_log("Redirecting...\n");
+		else printf_log("Redirecting to url:\n%s\n", newurl);
 		
 		ret = setupContext(context, newurl, size, gitapi);
 		free(newurl);
@@ -107,14 +107,14 @@ Result setupContext(httpcContext * context, const char * url, u32 * size, bool g
 	}
 	
 	if (statuscode != 200) {
-		printf("Error: HTTP status code is not 200 OK.\nStatus code: %lu\n", statuscode);
+		printf_log("Error: HTTP status code is not 200 OK.\nStatus code: %lu\n", statuscode);
 		httpcCloseContext(context);
 		return DL_ERROR_STATUSCODE;
 	}
 	
 	ret = httpcGetDownloadSizeState(context, NULL, size);
 	if (ret != 0) {
-		printf("Error in:\nhttpcGetDownloadSizeState\n");
+		printf_log("Error in:\nhttpcGetDownloadSizeState\n");
 		httpcCloseContext(context);
 		return ret;
 	}
@@ -125,16 +125,16 @@ Result setupContext(httpcContext * context, const char * url, u32 * size, bool g
 Result downloadToFile(const char * url, const char * filepath, bool gitapi)
 {
 	if (url == NULL) {
-		printf("Download cannot start, the URL in config.json is blank.\n");
+		printf_log("Download cannot start, the URL in config.json is blank.\n");
 		return DL_ERROR_CONFIG;
 	}
 	
 	if (filepath == NULL) {
-		printf("Download cannot start, file path in config.json is blank.\n");
+		printf_log("Download cannot start, file path in config.json is blank.\n");
 		return DL_ERROR_CONFIG;
 	}
 	
-	printf("Downloading file from:\n%s\nto:\n%s\n", url, filepath);
+	printf_log("Downloading file from:\n%s\nto:\n%s\n", url, filepath);
 	
 	httpcContext context;
 	Result ret = 0;
@@ -143,7 +143,7 @@ Result downloadToFile(const char * url, const char * filepath, bool gitapi)
 	ret = setupContext(&context, url, &contentsize, gitapi);
 	if (ret != 0) return ret;
 	
-	printf("Downloading %lu bytes...\n", contentsize);
+	printf_log("Downloading %lu bytes...\n", contentsize);
 	
 	Handle filehandle;
 	u64 offset = 0;
@@ -151,7 +151,7 @@ Result downloadToFile(const char * url, const char * filepath, bool gitapi)
 	
 	ret = openFile(filepath, &filehandle, true);
 	if (ret != 0) {
-		printf("Error: couldn't open file to write.\n");
+		printf_log("Error: couldn't open file to write.\n");
 		httpcCloseContext(&context);
 		return DL_ERROR_WRITEFILE;
 	}
@@ -168,14 +168,14 @@ Result downloadToFile(const char * url, const char * filepath, bool gitapi)
 		writeFile(filehandle, &bytesWritten, offset, buf, readsize);
 		offset += readsize;
 	} while (ret == (Result)HTTPC_RESULTCODE_DOWNLOADPENDING);
-	printf("Download took %llu milliseconds.\n", osGetTime()-startTime);
+	printf_log("Download took %llu milliseconds.\n", osGetTime()-startTime);
 	
 	free(buf);
 	closeFile(filehandle);
 	httpcCloseContext(&context);
 	
 	if (ret != 0) {
-		printf("Error in:\nhttpcDownloadData\n");
+		printf_log("Error in:\nhttpcDownloadData\n");
 		return ret;
 	}
 	
@@ -185,17 +185,17 @@ Result downloadToFile(const char * url, const char * filepath, bool gitapi)
 Result downloadFromRelease(const char * url, const char * element, const char * filepath)
 {
 	if (url == NULL) {
-		printf("Download cannot start, the URL in config.json is blank.\n");
+		printf_log("Download cannot start, the URL in config.json is blank.\n");
 		return DL_ERROR_CONFIG;
 	}
 	
 	if (element == NULL) {
-		printf("Download cannot start, inrelease in config.json is blank.\n");
+		printf_log("Download cannot start, inrelease in config.json is blank.\n");
 		return DL_ERROR_CONFIG;
 	}
 	
 	if (filepath == NULL) {
-		printf("Download cannot start, file path in config.json is blank.\n");
+		printf_log("Download cannot start, file path in config.json is blank.\n");
 		return DL_ERROR_CONFIG;
 	}
 	
@@ -216,8 +216,8 @@ Result downloadFromRelease(const char * url, const char * element, const char * 
 	
 	char * apiurl = NULL;
 	asprintf(&apiurl, "https://api.github.com/repos/%s/%s/releases/latest", repo_owner, repo_name);
-	printf("Downloading latest release from repo:\n%s\nby:\n%s\n", repo_name, repo_owner);
-	printf("Crafted api url:\n%s\n", apiurl);
+	printf_log("Downloading latest release from repo:\n%s\nby:\n%s\n", repo_name, repo_owner);
+	printf_log("Crafted api url:\n%s\n", apiurl);
 	free(copyurl);
 	
 	httpcContext context;
@@ -241,13 +241,13 @@ Result downloadFromRelease(const char * url, const char * element, const char * 
 	
 	httpcCloseContext(&context);
 	if (ret != 0) {
-		printf("Error in:\nhttpcDownloadData\n");
+		printf_log("Error in:\nhttpcDownloadData\n");
 		free(buf);
 		return ret;
 	}
 	
 	char * asseturl = NULL;
-	printf("\x1b[40;34mSearching for asset %s in api response...\x1b[0m\n", element);
+	printf_log("\x1b[40;34mSearching for asset %s in api response...\x1b[0m\n", element);
 	getAssetUrl((const char *)buf, element, &asseturl);
 	free(buf);
 	

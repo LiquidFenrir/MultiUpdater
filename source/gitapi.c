@@ -32,8 +32,8 @@ void getAssetUrl(const char * apiresponse, const char * element, char ** assetur
 		offset = (int)(foundpos+strlen(name_tagname)-apiresponse);
 		char * name = findTagValue(foundpos, name_tagname);
 		if (!matchPattern(element, name)) {
-			printf("Found asset with name matching %s\n", element);
-			printf("Finding asset url...\n");
+			printf_log("Found asset with name matching %s\n", element);
+			printf_log("Finding asset url...\n");
 			*asseturl = findTagValue(foundpos, url_tagname);
 			free(name);
 			return;
@@ -41,5 +41,5 @@ void getAssetUrl(const char * apiresponse, const char * element, char ** assetur
 		free(name);
 	}
 	
-	printf("No asset with name matching %s found.\n", element);
+	printf_log("No asset with name matching %s found.\n", element);
 }

@@ -7,7 +7,7 @@ Result deletePrevious(u64 titleid, FS_MediaType media)
 	u32 titles_amount = 0;
 	ret = AM_GetTitleCount(media, &titles_amount);
 	if (ret) {
-		printf("Error in:\nAM_GetTitleCount\n");
+		printf_log("Error in:\nAM_GetTitleCount\n");
 		return ret;
 	}
 	
@@ -15,7 +15,7 @@ Result deletePrevious(u64 titleid, FS_MediaType media)
 	u64 * titleIDs = malloc(titles_amount * sizeof(u64));
 	ret = AM_GetTitleList(&read_titles, media, titles_amount, titleIDs);
 	if (ret) {
-		printf("Error in:\nAM_GetTitleList\n");
+		printf_log("Error in:\nAM_GetTitleList\n");
 		return ret;
 	}
 	
@@ -28,7 +28,7 @@ Result deletePrevious(u64 titleid, FS_MediaType media)
 	
 	free(titleIDs);
 	if (ret) {
-		printf("Error in:\nAM_DeleteAppTitle\n");
+		printf_log("Error in:\nAM_DeleteAppTitle\n");
 		return ret;
 	}
 	
@@ -51,13 +51,13 @@ Result installCia(const char * ciaPath)
 	
 	ret = FSUSER_OpenFileDirectly(&fileHandle, sdmcArchive, emptyPath, filePath, FS_OPEN_READ, 0x00000000);
 	if (ret) {
-		printf("Error in:\nFSUSER_OpenFileDirectly\n");
+		printf_log("Error in:\nFSUSER_OpenFileDirectly\n");
 		return ret;
 	}
 	
 	ret = AM_GetCiaFileInfo(media, &info, fileHandle);
 	if (ret) {
-		printf("Error in:\nAM_GetCiaFileInfo\n");
+		printf_log("Error in:\nAM_GetCiaFileInfo\n");
 		return ret;
 	}
 	
@@ -66,12 +66,12 @@ Result installCia(const char * ciaPath)
 	
 	ret = FSFILE_GetSize(fileHandle, &size);
 	if (ret) {
-		printf("Error in:\nFSFILE_GetSize\n");
+		printf_log("Error in:\nFSFILE_GetSize\n");
 		return ret;
 	}
 	ret = AM_StartCiaInstall(media, &ciaHandle);
 	if (ret) {
-		printf("Error in:\nAM_StartCiaInstall\n");
+		printf_log("Error in:\nAM_StartCiaInstall\n");
 		return ret;
 	}
 	
@@ -86,12 +86,12 @@ Result installCia(const char * ciaPath)
 	
 	ret = AM_FinishCiaInstall(ciaHandle);
 	if (ret) {
-		printf("Error in:\nAM_FinishCiaInstall\n");
+		printf_log("Error in:\nAM_FinishCiaInstall\n");
 		return ret;
 	}
 	ret = svcCloseHandle(fileHandle);
 	if (ret) {
-		printf("Error in:\nsvcCloseHandle\n");
+		printf_log("Error in:\nsvcCloseHandle\n");
 		return ret;
 	}
 	

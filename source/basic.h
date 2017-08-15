@@ -10,6 +10,8 @@
 
 #define WORKING_DIR "/3ds/MultiUpdater/"
 
+#include "log.h"
+
 #define ERROR_JSON 1
 #define ERROR_FILE 2
 

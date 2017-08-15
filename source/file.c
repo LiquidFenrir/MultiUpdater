@@ -16,7 +16,7 @@ void makeDirs(FS_Archive archive, FS_Path filePath)
 	asprintf(&path, "%s", (char*)filePath.data);
 	
 	ret = FSUSER_OpenArchive(&archive, archive, fsMakePath(PATH_EMPTY, ""));
-	if (ret != 0) printf("Error in:\nFSUSER_OpenArchive\nError: 0x%08x\n", (unsigned int)ret);
+	if (ret != 0) printf_log("Error in:\nFSUSER_OpenArchive\nError: 0x%08x\n", (unsigned int)ret);
 	
 	for (char * slashpos = strchr(path+1, '/'); slashpos != NULL; slashpos = strchr(slashpos+1, '/')) {
 		char bak = *(slashpos);
@@ -26,9 +26,9 @@ void makeDirs(FS_Archive archive, FS_Path filePath)
 		ret = FSUSER_OpenDirectory(&dirHandle, archive, dirpath);
 		if(ret == 0) FSDIR_Close(dirHandle);
 		else {
-			printf("Creating dir: %s\n", path);
+			printf_log("Creating dir: %s\n", path);
 			ret = FSUSER_CreateDirectory(archive, dirpath, FS_ATTRIBUTE_DIRECTORY);
-			if (ret != 0) printf("Error in:\nFSUSER_CreateDirectory\nError: 0x%08x\n", (unsigned int)ret);
+			if (ret != 0) printf_log("Error in:\nFSUSER_CreateDirectory\nError: 0x%08x\n", (unsigned int)ret);
 		}
 		*(slashpos) = bak;
 	}
@@ -74,9 +74,9 @@ Result openFile(const char * path, Handle * filehandle, bool write)
 	
 	makeDirs(archive, filePath);
 	ret = FSUSER_OpenFileDirectly(filehandle, archive, emptyPath, filePath, flags, 0);
-	if (ret != 0) printf("Error in:\nFSUSER_OpenFileDirectly\nError: 0x%08x\n", (unsigned int)ret);
+	if (ret != 0) printf_log("Error in:\nFSUSER_OpenFileDirectly\nError: 0x%08x\n", (unsigned int)ret);
 	if (write) ret = FSFILE_SetSize(*filehandle, 0); //truncate the file to remove previous contents before writing
-	if (ret != 0) printf("Error in:\nFSFILE_SetSize\nError: 0x%08x\n", (unsigned int)ret);
+	if (ret != 0) printf_log("Error in:\nFSFILE_SetSize\nError: 0x%08x\n", (unsigned int)ret);
 	
 	return ret;
 }
@@ -84,24 +84,24 @@ Result openFile(const char * path, Handle * filehandle, bool write)
 Result copyFile(const char * srcpath, const char * destpath)
 {
 	if (srcpath == NULL || destpath == NULL) {
-		printf("Can't copy, path is empty.\n");
+		printf_log("Can't copy, path is empty.\n");
 		return -1;
 	}
 	
 	Handle filehandle;
 	Result ret = openFile(srcpath, &filehandle, false);
 	if (ret != 0) {
-		printf("Can't copy, couldn't open source file.\n");
+		printf_log("Can't copy, couldn't open source file.\n");
 		return -2;
 	}
 	
 	FILE *destptr = fopen(destpath, "wb");
 	if (destptr == NULL) {
-		printf("Couldnt open destination file to write.\n");
+		printf_log("Couldnt open destination file to write.\n");
 		return -3;
 	}
 	
-	printf("Copying:\n%s\nto:\n%s\n", srcpath, destpath);
+	printf_log("Copying:\n%s\nto:\n%s\n", srcpath, destpath);
 	
 	u8 * buf = malloc(0x1000);
 	u32 bytesRead = 0;
@@ -113,7 +113,7 @@ Result copyFile(const char * srcpath, const char * destpath)
 		offset += bytesRead;
 	} while(bytesRead);
 	
-	printf("Copied %llu bytes.\n", offset);
+	printf_log("Copied %llu bytes.\n", offset);
 	
 	closeFile(filehandle);
 	fclose(destptr);
@@ -125,12 +125,12 @@ Result copyFile(const char * srcpath, const char * destpath)
 Result extractFileFrom7z(const char * archive_file, const char * filename, const char * filepath)
 {	
 	if (filename == NULL) {
-		printf("Cannot start, the inarchive in config.json is blank.\n");
+		printf_log("Cannot start, the inarchive in config.json is blank.\n");
 		return EXTRACTION_ERROR_CONFIG;
 	}
 	
 	if (filepath == NULL) {
-		printf("Cannot start, the path in config.json is blank.\n");
+		printf_log("Cannot start, the path in config.json is blank.\n");
 		return EXTRACTION_ERROR_CONFIG;
 	}
 	
@@ -138,7 +138,7 @@ Result extractFileFrom7z(const char * archive_file, const char * filename, const
 	
 	FILE * archive = fopen(archive_file, "rb");
 	if (archive == NULL) {
-		printf("Error: couldn't open archive to read.\n");
+		printf_log("Error: couldn't open archive to read.\n");
 		return EXTRACTION_ERROR_ARCHIVE_OPEN;
 	}
 	
@@ -210,7 +210,7 @@ Result extractFileFrom7z(const char * archive_file, const char * filename, const
 						&allocTempImp
 			);
 			if (res != SZ_OK) {
-				printf("Error: Couldn't extract file data from archive.\n");
+				printf_log("Error: Couldn't extract file data from archive.\n");
 				ret = EXTRACTION_ERROR_READ_IN_ARCHIVE;
 				goto finish;
 			}
@@ -220,7 +220,7 @@ Result extractFileFrom7z(const char * archive_file, const char * filename, const
 			
 			ret = openFile(filepath, &filehandle, true);
 			if (ret != 0) {
-				printf("Error: couldn't open file to write.\n");
+				printf_log("Error: couldn't open file to write.\n");
 				return EXTRACTION_ERROR_WRITEFILE;
 			}
 			
@@ -233,7 +233,7 @@ Result extractFileFrom7z(const char * archive_file, const char * filename, const
 		}
 	}
 	
-	printf("Couldn't find a file with a name matching %s in the archive.\n", filename);
+	printf_log("Couldn't find a file with a name matching %s in the archive.\n", filename);
 	ret = EXTRACTION_ERROR_FIND;
 	
 	finish:
@@ -251,12 +251,12 @@ static int unzipMatchPattern(__attribute__ ((unused)) unzFile file, const char *
 Result extractFileFromZip(const char * archive_file, const char * filename, const char * filepath)
 {	
 	if (filename == NULL) {
-		printf("Cannot start, the inarchive in config.json is blank.\n");
+		printf_log("Cannot start, the inarchive in config.json is blank.\n");
 		return EXTRACTION_ERROR_CONFIG;
 	}
 	
 	if (filepath == NULL) {
-		printf("Cannot start, the path in config.json is blank.\n");
+		printf_log("Cannot start, the path in config.json is blank.\n");
 		return EXTRACTION_ERROR_CONFIG;
 	}
 	
@@ -268,13 +268,13 @@ Result extractFileFromZip(const char * archive_file, const char * filename, cons
 	
 	ret = openFile(filepath, &filehandle, true);
 	if (ret != 0) {
-		printf("Error: couldn't open file to write.\n");
+		printf_log("Error: couldn't open file to write.\n");
 		return EXTRACTION_ERROR_WRITEFILE;
 	}
 	
 	unzFile uf = unzOpen64(archive_file);
 	if (uf == NULL) {
-		printf("Couldn't open zip file.\n");
+		printf_log("Couldn't open zip file.\n");
 		closeFile(filehandle);
 		return EXTRACTION_ERROR_ARCHIVE_OPEN;
 	}
@@ -284,13 +284,13 @@ Result extractFileFromZip(const char * archive_file, const char * filename, cons
 	ret = unzLocateFile(uf, filename, &unzipMatchPattern);
 
 	if (ret == UNZ_END_OF_LIST_OF_FILE) {
-		printf("Couldn't find the wanted file in the zip.\n");
+		printf_log("Couldn't find the wanted file in the zip.\n");
 		ret = EXTRACTION_ERROR_FIND;
 	}
 	else if (ret == UNZ_OK) {
 		ret = unzGetCurrentFileInfo(uf, &payloadInfo, NULL, 0, NULL, 0, NULL, 0);
 		if (ret != UNZ_OK) {
-			printf("Couldn't get the file information.\n");
+			printf_log("Couldn't get the file information.\n");
 			ret = EXTRACTION_ERROR_INFO;
 			goto finish;
 		}
@@ -304,7 +304,7 @@ Result extractFileFromZip(const char * archive_file, const char * filename, cons
 		
 		ret = unzOpenCurrentFile(uf);
 		if (ret != UNZ_OK) {
-			printf("Couldn't open file in the archive to read\n");
+			printf_log("Couldn't open file in the archive to read\n");
 			ret = EXTRACTION_ERROR_OPEN_IN_ARCHIVE;
 			goto finish;
 		}
@@ -315,7 +315,7 @@ Result extractFileFromZip(const char * archive_file, const char * filename, cons
 			if (size < toRead) toRead = size;
 			ret = unzReadCurrentFile(uf, buf, toRead);
 			if (ret < 0) {
-				printf("Couldn't read data from the file in the archive\n");
+				printf_log("Couldn't read data from the file in the archive\n");
 				ret = EXTRACTION_ERROR_READ_IN_ARCHIVE;
 				goto finish;
 			}
@@ -342,12 +342,12 @@ Result extractFileFromArchive(const char * archive_path, const char * filename, 
 	
 	unzFile uf = unzOpen64(archive_path);
 	if (uf == NULL) {
-		printf("Opening as a 7z file...\n");
+		printf_log("Opening as a 7z file...\n");
 		//failure to open as a zip -> must be 7z
 		ret = extractFileFrom7z(archive_path, filename, filepath);
 	}
 	else {
-		printf("Opening as a zip file...\n");
+		printf_log("Opening as a zip file...\n");
 		unzClose(uf);
 		ret = extractFileFromZip(archive_path, filename, filepath);
 	}
