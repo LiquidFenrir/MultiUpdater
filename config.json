@@ -1,10 +1,16 @@
 {
 	"entries": [
 		{
-			"name": "Themely (latest release)",
-			"url": "https://github.com/ErmanSayin/Themely",
-			"inrelease": "Themely.cia",
-			"path": "/cias/Themely.cia"
+			"name": "3DSident (GUI)",
+			"url": "https://github.com/joel16/3DSident",
+			"inrelease": "3DSident_GUI.cia",
+			"path": "/cias/3DSident_GUI.cia"
+		},
+		{
+			"name": "3DSident",
+			"url": "https://github.com/joel16/3DSident",
+			"inrelease": "3DSident.cia",
+			"path": "/cias/3DSident.cia"
 		},
 		{
 			"name": "GodMode9 (latest commit)",
@@ -18,12 +24,6 @@
 			"inrelease": "GodMode9-*-*.zip",
 			"inarchive": "GodMode9.firm",
 			"path": "/luma/payloads/GodMode9.firm"
-		},
-		{
-			"name": "CTRXplorer (latest commit)",
-			"url": "https://d0k3.secretalgorithm.com/CTRXplorer/latest.zip",
-			"inarchive": "3ds-arm/CTRXplorer.cia",
-			"path": "/cias/CTRXplorer.cia"
 		},
 		{
 			"name": "Luma3DS (latest commit)",
