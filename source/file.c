@@ -12,8 +12,8 @@ void makeDirs(FS_Archive archive, FS_Path filePath)
 {
 	Result ret = 0;
 	
-	char * path = calloc(filePath.size +1, sizeof(char));
-	strncpy(path, filePath.data, filePath.size);
+	char * path = NULL;
+	asprintf(&path, "%s", (char*)filePath.data);
 	
 	ret = FSUSER_OpenArchive(&archive, archive, fsMakePath(PATH_EMPTY, ""));
 	if (ret != 0) printf("Error in:\nFSUSER_OpenArchive\nError: 0x%08x\n", (unsigned int)ret);
@@ -63,8 +63,8 @@ Result openFile(const char * path, Handle * filehandle, bool write)
 	}
 	else if (*path != '/') {
 		//if the path is local (doesnt start with a slash), it needs to be appended to the working dir to be valid
-		char * actualPath = malloc(strlen(WORKING_DIR) + strlen(path) + 1);
-		sprintf(actualPath, "%s%s", WORKING_DIR, path);
+		char * actualPath = NULL;
+		asprintf(&actualPath, "%s%s", WORKING_DIR, path);
 		filePath = fsMakePath(PATH_ASCII, actualPath);
 		free(actualPath);
 	}

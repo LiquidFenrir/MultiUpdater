@@ -43,7 +43,7 @@ CFLAGS	:=	-g -Wall -Wextra -O2 -mword-relocations \
 			-fomit-frame-pointer -ffunction-sections \
 			$(ARCH)
 
-CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS -DVERSION_STRING="\"$(VERSION)\""
+CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS -D_GNU_SOURCE -DVERSION_STRING="\"$(VERSION)\""
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 
@@ -135,7 +135,7 @@ cia : $(OUTPUT).cia
 
 all: 3dsx cia
 
-release: all $(OUTPUT)-$(VERSION).zip
+release: clean all $(OUTPUT)-$(VERSION).zip
 
 $(BUILD):
 	@mkdir -p $(OUTDIR)

@@ -96,8 +96,8 @@ int main()
 		goto exit;
 	}
 
-	char filepath[256];
-	sprintf(filepath, "%sconfig.json", WORKING_DIR);
+	char * filepath = NULL;
+	asprintf(&filepath, "%sconfig.json", WORKING_DIR);
 
 	get_config(filepath, &parsed_config);
 
@@ -180,8 +180,8 @@ int main()
 						drawMenu(&parsed_config, state, i);
 						consoleSelect(&bottomScreen);
 						
-						char backuppath[256];
-						sprintf(backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
+						char * backuppath = NULL;
+						asprintf(&backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
 						cleanPath(backuppath);
 						printf("\x1b[40;32mBacking up %s...\x1b[0m\n", parsed_config.entries[i].name);
 						
@@ -193,6 +193,8 @@ int main()
 							printf("\x1b[40;32mBackup complete!");
 						}
 						printf("\x1b[0m\n");
+						
+						free(backuppath);
 						
 						gfxFlushBuffers();
 						gfxSwapBuffers();
@@ -209,8 +211,8 @@ int main()
 						drawMenu(&parsed_config, state, i);
 						consoleSelect(&bottomScreen);
 						
-						char backuppath[256];
-						sprintf(backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
+						char * backuppath = NULL;
+						asprintf(&backuppath, "%s%s.bak", WORKING_DIR, parsed_config.entries[i].name);
 						cleanPath(backuppath);
 						printf("\x1b[40;Restoring %s...\x1b[0m\n", parsed_config.entries[i].name);
 						
@@ -223,6 +225,8 @@ int main()
 							remove(backuppath);
 						}
 						printf("\x1b[0m\n");
+						
+						free(backuppath);
 						
 						gfxFlushBuffers();
 						gfxSwapBuffers();

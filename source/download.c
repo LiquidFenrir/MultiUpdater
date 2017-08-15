@@ -202,7 +202,6 @@ Result downloadFromRelease(const char * url, const char * element, const char * 
 	char * copyurl = strdup(url);
 	char * repo_name = copyurl;
 	char * repo_owner = copyurl;
-	char apiurl[256] = {0};
 	
 	unsigned int startpos = 0;
 	if (strncmp("http", copyurl, 4) == 0) startpos = 8; //if the url in the entry starts with http:// or https:// we need to skip that
@@ -214,7 +213,9 @@ Result downloadFromRelease(const char * url, const char * element, const char * 
 			else break;
 		}
 	}
-	sprintf(apiurl, "https://api.github.com/repos/%s/%s/releases/latest", repo_owner, repo_name);
+	
+	char * apiurl = NULL;
+	asprintf(&apiurl, "https://api.github.com/repos/%s/%s/releases/latest", repo_owner, repo_name);
 	printf("Downloading latest release from repo:\n%s\nby:\n%s\n", repo_name, repo_owner);
 	printf("Crafted api url:\n%s\n", apiurl);
 	free(copyurl);
@@ -224,6 +225,7 @@ Result downloadFromRelease(const char * url, const char * element, const char * 
 	u32 contentsize = 0, readsize = 0;
 	
 	ret = setupContext(&context, apiurl, &contentsize, true);
+	free(apiurl);
 	if (ret != 0) return ret;
 	
 	char * buf = malloc(contentsize+1);
