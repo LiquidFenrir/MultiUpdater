@@ -1,0 +1,14 @@
+*.smdh
+*.bin
+*.bnr
+*.icn
+*.icon
+*.3dsx
+*.elf
+*.bat
+*.lnk
+*.cia
+*.lst
+*.map
+build/*
+out/*
