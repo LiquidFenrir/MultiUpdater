@@ -164,7 +164,7 @@ Result downloadToFile(std::string url, std::string path, bool gitapi)
 }
 
 Result downloadFromRelease(std::string url, std::string asset, std::string path)
-{	
+{
 	std::regex parseUrl("github\\.com\\/(.+)\\/(.+)");
 	std::smatch result;
 	regex_search(url, result, parseUrl);
@@ -204,12 +204,26 @@ Result downloadFromRelease(std::string url, std::string asset, std::string path)
 		return ret;
 	}
 	
-	// if (asseturl == NULL)
-		// ret = DL_ERROR_GIT;
-	// else {
-		// ret = downloadToFile(asseturl, filepath, true);
-		// free(asseturl);
-	// }
+	printf("Looking for asset with name matching:\n%s\n", asset.c_str());
+	std::string assetUrl;
+	json parsedAPI = json::parse(buf);
+	if (parsedAPI["assets"].is_array()) {
+		for (auto jsonAsset : parsedAPI["assets"]) {
+			if (jsonAsset.is_object() && jsonAsset["name"].is_string() && jsonAsset["browser_download_url"].is_string()) {
+				std::string assetName = jsonAsset["name"];
+				if (matchPattern(asset, assetName)) {
+					assetUrl = jsonAsset["browser_download_url"];
+					break;
+				}
+			}
+		}
+	}
+	free(buf);
+	
+	if (assetUrl.empty())
+		ret = DL_ERROR_GIT;
+	else
+		ret = downloadToFile(assetUrl, path, true);
 	
 	return ret;
 }
