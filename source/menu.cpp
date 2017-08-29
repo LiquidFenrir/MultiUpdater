@@ -94,4 +94,6 @@ void drawMenu(Config config, unsigned int selectedEntry)
 			config.entries[i].name.c_str() + ((i == selectedEntry) ? horizontalScroll : 0)
 		);
 	}
+	
+	printf("\x1b[0m\x1b[%u;%uH%*s\n", TITLE_Y_OFFSET+MAX_ENTRIES_PER_SCREEN+MENU_Y_OFFSET, TITLE_X_OFFSET, MENU_WIDTH+TITLE_X_OFFSET+1, "Press START to quit.");
 }
