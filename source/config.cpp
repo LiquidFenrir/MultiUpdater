@@ -108,13 +108,11 @@ Config::Config()
 	Result ret = openFile(&configHandle, CONFIG_FILE_PATH, false);
 
 	if (R_FAILED(ret)) {
-		auto configDownloadJson = R"(
-			{
-				"name": "Download the latest example config!",
-				"url": CONFIG_FILE_URL,
-				"path": CONFIG_FILE_PATH
-			}
-		)"_json;
+		json configDownloadJson;
+		configDownloadJson["name"] = "Download the latest example config!";
+		configDownloadJson["url"] = CONFIG_FILE_URL;
+		configDownloadJson["path"] = CONFIG_FILE_PATH;
+
 		Entry configDownloadEntry(configDownloadJson);
 		entries.push_back(configDownloadEntry);
 	}
@@ -125,26 +123,27 @@ Config::Config()
 		u32 bytesRead = 0;
 		FSFILE_Read(configHandle, &bytesRead, 0, configString, (u32)configSize);
 
-		auto parsedConfig = json::parse(configString);
+		json parsedConfig = json::parse(configString);
 
 		if (parsedConfig["config"].is_object()) {
-			m_selfUpdater = parsedConfig["config"]["self_updater"];
-			m_deleteCIA = parsedConfig["config"]["delete_cias"];
-			m_deleteArchive = parsedConfig["config"]["delete_archives"];
-			m_logOutput = parsedConfig["config"]["log_output"];
+			if (parsedConfig["config"]["self_updater"].is_boolean())
+				m_selfUpdater = parsedConfig["config"]["self_updater"];
+			if (parsedConfig["config"]["delete_cias"].is_boolean())
+				m_deleteCIA = parsedConfig["config"]["delete_cias"];
+			if (parsedConfig["config"]["delete_archives"].is_boolean())
+				m_deleteArchive = parsedConfig["config"]["delete_archives"];
+			if (parsedConfig["config"]["log_output"].is_boolean())
+				m_logOutput = parsedConfig["config"]["log_output"];
 		}
 
 		if (m_selfUpdater) {
-			auto selfUpdaterJson = R"(
-				{
-					"name": "MultiUpdater",
-					"url": "https://github.com/LiquidFenrir/MultiUpdater",
-					"inrelease": "MultiUpdater-v*zip",
-					"inarchive": "MultiUpdater.cia",
-					"path": "/cias/MultiUpdater.cia"
-				}
-			)"_json;
-			
+			json selfUpdaterJson;
+			selfUpdaterJson["name"] = "MultiUpdater";
+			selfUpdaterJson["url"] = "https://github.com/LiquidFenrir/MultiUpdater";
+			selfUpdaterJson["inrelease"] = "MultiUpdater-v*zip";
+			selfUpdaterJson["inarchive"] = "MultiUpdater.cia";
+			selfUpdaterJson["path"] = "/cias/MultiUpdater.cia";
+
 			Entry selfUpdateEntry(selfUpdaterJson);
 			entries.push_back(selfUpdateEntry);
 		}
