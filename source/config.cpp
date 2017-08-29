@@ -24,7 +24,7 @@ Entry::Entry(json jsonEntry)
 
 void Entry::update()
 {
-	printf("\x1b[40;34;1mUpdating %s...\x1b[0m\n", name.c_str());
+	printf("\x1b[40;34mUpdating %s...\x1b[0m\n", name.c_str());
 	std::string downloadPath;
 	
 	//if the file to download isnt an archive, direcly download where wanted
@@ -47,41 +47,41 @@ void Entry::update()
 		ret = downloadFromRelease(m_url, m_inRelease, downloadPath);
 	
 	if (ret != 0) {
-		printf("\x1b[40;31;1mDownload failed!");
+		printf("\x1b[40;31mDownload failed!");
 		goto failure;
 	}
 	else
-		printf("\x1b[40;32;1mDownload successful!");
+		printf("\x1b[40;32mDownload successful!");
 	
 	if (!(m_inArchive.empty())) {
-		printf("\n\x1b[40;34;1mExtracting file from the archive...\x1b[0m\n");
+		printf("\n\x1b[40;34mExtracting file from the archive...\x1b[0m\n");
 		ret = extractArchive(downloadPath, m_inArchive, m_path);
 		if (ret != 0) {
-			printf("\x1b[40;31;1mExtraction failed!");
+			printf("\x1b[40;31mExtraction failed!");
 			goto failure;
 		}
 		else
-			printf("\x1b[40;32;1mExtraction successful!");
+			printf("\x1b[40;32mExtraction successful!");
 	}
 	
 	if (matchPattern(".*(\\.cia)$", m_path)) {
-		printf("\n\x1b[40;34;1mInstalling CIA...\x1b[0m\n");
+		printf("\n\x1b[40;34mInstalling CIA...\x1b[0m\n");
 		ret = installCia(m_path.c_str());
 		if (R_FAILED(ret)) {
-			printf("\x1b[40;31;1mExtraction failed!");
+			printf("\x1b[40;31mExtraction failed!");
 			goto failure;
 		}
 		else
-			printf("\x1b[40;32;1mExtraction successful!");
+			printf("\x1b[40;32mExtraction successful!");
 	}
 	
-	printf("\n\x1b[40;32;1mUpdate complete!\x1b[0m\n");
+	printf("\n\x1b[40;32mUpdate complete!\x1b[0m\n");
 	state = STATE_SUCCESS;
 	return;
 	
 	failure:
-	printf("\n\x1b[40;31;1mUpdate failed!\n");
-	printf("\x1b[40;33;1mError code: %.8lx\x1b[0m\n", ret);
+	printf("\n\x1b[40;31mUpdate failed!\n");
+	printf("\x1b[40;33mError code: %.8lx\x1b[0m\n", ret);
 	state = STATE_FAILED;
 	return;
 }
