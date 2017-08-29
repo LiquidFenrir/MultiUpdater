@@ -33,10 +33,9 @@ void Entry::update()
 	}
 	//otherwise, download to an archive in the working dir, then extract where wanted
 	else {
-		auto pathLength = std::snprintf(nullptr, 0, "%s%s.archive", WORKING_DIR, name.c_str());
-		std::string tempString(pathLength+1, '\0');
-		std::sprintf(&tempString[0], "%s%s.archive", WORKING_DIR, name.c_str());
-		downloadPath = tempString;
+		std::stringstream downloadPathStream;
+		downloadPathStream << WORKING_DIR << name.c_str() << ".archive";
+		downloadPath = downloadPathStream.str();
 	}
 	
 	Result ret = 0;
