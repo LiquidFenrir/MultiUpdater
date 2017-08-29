@@ -140,7 +140,7 @@ Config::Config()
 			json selfUpdaterJson;
 			selfUpdaterJson["name"] = "MultiUpdater";
 			selfUpdaterJson["url"] = "https://github.com/LiquidFenrir/MultiUpdater";
-			selfUpdaterJson["inrelease"] = "MultiUpdater-v*zip";
+			selfUpdaterJson["inrelease"] = "MultiUpdater.*\.zip";
 			selfUpdaterJson["inarchive"] = "MultiUpdater.cia";
 			selfUpdaterJson["path"] = "/cias/MultiUpdater.cia";
 
