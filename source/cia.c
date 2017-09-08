@@ -1,4 +1,5 @@
 #include "cia.h"
+#include "file.h"
 
 Result deletePrevious(u64 titleid, FS_MediaType media)
 {
@@ -44,14 +45,11 @@ Result installCia(const char * ciaPath)
 	AM_TitleEntry info;
 	Result ret = 0;
 	
-	FS_Archive sdmcArchive = (FS_Archive){ARCHIVE_SDMC};
-	FS_Path emptyPath = (FS_Path){PATH_EMPTY, 1, (u8*)""};
-	FS_Path filePath = fsMakePath(PATH_ASCII, ciaPath);
 	FS_MediaType media = MEDIATYPE_SD;
 	
-	ret = FSUSER_OpenFileDirectly(&fileHandle, sdmcArchive, emptyPath, filePath, FS_OPEN_READ, 0x00000000);
+	ret = openFile(ciaPath, &fileHandle, false);
 	if (ret) {
-		printf_log("Error in:\nFSUSER_OpenFileDirectly\n");
+		printf_log("Error in:\nopenFile\n");
 		return ret;
 	}
 	
@@ -79,8 +77,8 @@ Result installCia(const char * ciaPath)
 	u8 * cia_buffer = malloc(toRead);
 	for (u64 startSize = size; size != 0; size -= toRead) {
 		if (size < toRead) toRead = size;
-		FSFILE_Read(fileHandle, &bytes, startSize-size, cia_buffer, toRead);
-		FSFILE_Write(ciaHandle, &bytes, startSize-size, cia_buffer, toRead, 0);
+		readFile(fileHandle, &bytes, startSize-size, cia_buffer, toRead);
+		writeFile(ciaHandle, &bytes, startSize-size, cia_buffer, toRead);
 	}
 	free(cia_buffer);
 	
@@ -89,9 +87,9 @@ Result installCia(const char * ciaPath)
 		printf_log("Error in:\nAM_FinishCiaInstall\n");
 		return ret;
 	}
-	ret = svcCloseHandle(fileHandle);
+	ret = closeFile(fileHandle);
 	if (ret) {
-		printf_log("Error in:\nsvcCloseHandle\n");
+		printf_log("Error in:\ncloseFile\n");
 		return ret;
 	}
 	
