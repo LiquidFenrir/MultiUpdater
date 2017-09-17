@@ -86,18 +86,8 @@ void Entry::update()
 	return;
 }
 
-void Entry::backup()
-{
-
-}
-
-void Entry::restore()
-{
-
-}
-
 Config::Config()
-{	
+{
 	m_selfUpdater = true;
 	m_deleteCIA = false;
 	m_deleteArchive = true;

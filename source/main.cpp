@@ -16,7 +16,6 @@ int main()
 	Config config;
 	
 	unsigned int selectedEntry = 0;
-	EntryAction action = ACTION_UPDATE;
 	
 	while(aptMainLoop())
 	{
@@ -46,17 +45,7 @@ int main()
 			selectedEntry = config.entries.size()-1;
 		}
 		else if (kDown & KEY_A) {
-			switch (action) {
-				case (ACTION_UPDATE):
-					config.entries[selectedEntry].update();
-					break;
-				case (ACTION_BACKUP):
-					config.entries[selectedEntry].backup();
-					break;
-				case (ACTION_RESTORE):
-					config.entries[selectedEntry].restore();
-					break;
-			}
+			config.entries[selectedEntry].update();
 		}
 		
 		gfxFlushBuffers();

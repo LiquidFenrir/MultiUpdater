@@ -9,12 +9,6 @@ enum EntryState {
 	STATE_MARKED  = BIT(2),
 };
 
-enum EntryAction {
-	ACTION_UPDATE,
-	ACTION_BACKUP,
-	ACTION_RESTORE,
-};
-
 class Entry
 {
 	public:
@@ -25,8 +19,6 @@ class Entry
 	Entry(json jsonEntry);
 	
 	void update();
-	void backup();
-	void restore();
 	
 	private:
 	
