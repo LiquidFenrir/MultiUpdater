@@ -26,7 +26,7 @@
 		{
 			"name": "GodMode9 (latest release)",
 			"url": "https://github.com/d0k3/GodMode9",
-			"inrelease": "GodMode9.*\.zip",
+			"inrelease": "GodMode9.*\\.zip",
 			"inarchive": "GodMode9.firm",
 			"path": "/luma/payloads/GodMode9.firm"
 		},
@@ -39,14 +39,14 @@
 		{
 			"name": "Luma3DS (latest release)",
 			"url": "https://github.com/AuroraWright/Luma3DS",
-			"inrelease": "Luma3DS.*\.7z",
+			"inrelease": "Luma3DS.*\\.7z",
 			"inarchive": "boot.firm",
 			"path": "/boot.firm"
 		},
 		{
 			"name": "CTRNAND Luma3DS (latest release)",
 			"url": "https://github.com/AuroraWright/Luma3DS",
-			"inrelease": "Luma3DS.*\.7z",
+			"inrelease": "Luma3DS.*\\.7z",
 			"inarchive": "boot.firm",
 			"path": "ctrnand:/boot.firm"
 		}
