@@ -14,7 +14,6 @@ int main()
 	consoleInit(GFX_BOTTOM, &bottomScreen);
 	
 	Config config;
-	// initLogging(config.m_logOutput);
 	
 	unsigned int selectedEntry = 0;
 	EntryAction action = ACTION_UPDATE;

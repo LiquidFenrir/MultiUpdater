@@ -2,8 +2,7 @@
 	"config": {
 		"self_updater": true,
 		"delete_archives": true,
-		"delete_cias": false,
-		"log_output": true
+		"delete_cias": false
 	},
 	"entries": [
 		{

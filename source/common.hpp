@@ -29,7 +29,6 @@ using json = nlohmann::json;
 #endif
 
 #define WORKING_DIR       "/3ds/MultiUpdater"
-#define LOG_FILE_PATH     WORKING_DIR  "/output.log"
 #define CONFIG_FILE_PATH  WORKING_DIR  "/config.json"
 
 #define CONFIG_FILE_URL   "https://raw.githubusercontent.com/LiquidFenrir/MultiUpdater/master/config.json"

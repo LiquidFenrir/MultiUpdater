@@ -43,7 +43,6 @@ class Config
 	bool m_selfUpdater;
 	bool m_deleteCIA;
 	bool m_deleteArchive;
-	bool m_logOutput;
 	
 	std::vector<Entry> entries;
 	

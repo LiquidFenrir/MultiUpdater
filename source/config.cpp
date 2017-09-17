@@ -101,7 +101,6 @@ Config::Config()
 	m_selfUpdater = true;
 	m_deleteCIA = false;
 	m_deleteArchive = true;
-	m_logOutput = true;
 
 	Handle configHandle;
 	char* configString = nullptr;
@@ -132,8 +131,6 @@ Config::Config()
 				m_deleteCIA = parsedConfig["config"]["delete_cias"];
 			if (parsedConfig["config"]["delete_archives"].is_boolean())
 				m_deleteArchive = parsedConfig["config"]["delete_archives"];
-			if (parsedConfig["config"]["log_output"].is_boolean())
-				m_logOutput = parsedConfig["config"]["log_output"];
 		}
 
 		if (m_selfUpdater) {
