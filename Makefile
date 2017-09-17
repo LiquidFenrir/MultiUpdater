@@ -40,7 +40,7 @@ VERSION	:= 0.0.0
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-g -Wall -Wextra -O2 -mword-relocations \
+CFLAGS	:=	-g -O2 -Wall -Wextra -mword-relocations \
 			-fomit-frame-pointer -ffunction-sections \
 			$(ARCH)
 
