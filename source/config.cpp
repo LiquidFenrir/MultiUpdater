@@ -4,7 +4,7 @@
 #include "download.hpp"
 
 extern "C" {
-	#include "cia.h"
+#include "cia.h"
 }
 
 Entry::Entry(json jsonEntry)
