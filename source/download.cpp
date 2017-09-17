@@ -3,6 +3,8 @@
 #include "certs/digicert.h"
 #include "certs/cybertrust.h"
 
+#define  USER_AGENT   APP_TITLE "-" VERSION_STRING
+
 static Result setupContext(httpcContext * context, const char * url, u32 * size, bool gitapi)
 {
 	Result ret = 0;
@@ -15,7 +17,7 @@ static Result setupContext(httpcContext * context, const char * url, u32 * size,
 		return ret;
 	}
 	
-	ret = httpcAddRequestHeaderField(context, "User-Agent", "MultiUpdater");
+	ret = httpcAddRequestHeaderField(context, "User-Agent", USER_AGENT);
 	if (R_FAILED(ret)) {
 		printf("Error in:\nhttpcAddRequestHeaderField\n");
 		httpcCloseContext(context);

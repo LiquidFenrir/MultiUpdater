@@ -75,7 +75,7 @@ void drawMenu(Config config, unsigned int selectedEntry)
 		//----------------------------------------------------------------
 		unsigned int textColor = (i == selectedEntry) ? 30 : 37;
 		unsigned int textColorArray[] = {
-		textColor, // STATE_NONE
+			textColor, // STATE_NONE
 			31, // STATE_FAILED
 			32, // STATE_SUCCESS
 			33, // STATE_MARKED

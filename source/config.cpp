@@ -4,7 +4,7 @@
 #include "download.hpp"
 
 extern "C" {
-	#include "cia.h"
+#include "cia.h"
 }
 
 Entry::Entry(json jsonEntry)
@@ -95,7 +95,7 @@ Config::Config()
 	Handle configHandle;
 	char* configString = nullptr;
 	Result ret = openFile(&configHandle, CONFIG_FILE_PATH, false);
-
+	
 	if (R_FAILED(ret)) {
 		json configDownloadJson;
 		configDownloadJson["name"] = "Download the latest example config!";

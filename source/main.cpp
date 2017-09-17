@@ -2,7 +2,6 @@
 #include "menu.hpp"
 #include "config.hpp"
 
-
 int main()
 {	
 	gfxInitDefault();
