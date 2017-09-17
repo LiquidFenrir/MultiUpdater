@@ -28,7 +28,10 @@ using json = nlohmann::json;
 
 #endif
 
-#define WORKING_DIR       "/3ds/MultiUpdater"
-#define CONFIG_FILE_PATH  WORKING_DIR  "/config.json"
+#define WORKING_DIR       "/3ds/"  APP_TITLE
+
+#define CONFIG_FILE_NAME  "config.json"
+#define CONFIG_FILE_PATH  WORKING_DIR  "/"  CONFIG_FILE_NAME
+#define CONFIG_FILE_ROMFS "romfs:/"  CONFIG_FILE_NAME
 
 #define CONFIG_FILE_URL   "https://raw.githubusercontent.com/LiquidFenrir/MultiUpdater/master/config.json"

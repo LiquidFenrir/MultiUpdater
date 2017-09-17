@@ -52,6 +52,12 @@ Result openFile(Handle* fileHandle, const char * path, bool write)
 	else if (!strncmp(path, "sdmc:/", 6)) {
 		prefixlen = 5;
 	}
+	else if (!strncmp(path, "romfs:/", 7)) {
+		if (write)
+			return -1;
+		archive = ARCHIVE_ROMFS;
+		prefixlen = 6;
+	}
 	else if (*path != '/') {
 		//if the path is local (doesnt start with a slash), it needs to be appended to the working dir to be valid
 		char * actualPath = NULL;

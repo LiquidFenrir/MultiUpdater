@@ -97,6 +97,11 @@ Config::Config()
 	Result ret = openFile(&configHandle, CONFIG_FILE_PATH, false);
 
 	if (R_FAILED(ret)) {
+		//try to open the config from romfs
+		ret = openFile(&configHandle, CONFIG_FILE_ROMFS, false);
+	}
+	
+	if (R_FAILED(ret)) {
 		json configDownloadJson;
 		configDownloadJson["name"] = "Download the latest example config!";
 		configDownloadJson["url"] = CONFIG_FILE_URL;
@@ -127,7 +132,7 @@ Config::Config()
 			json selfUpdaterJson;
 			selfUpdaterJson["name"] = "MultiUpdater";
 			selfUpdaterJson["url"] = "https://github.com/LiquidFenrir/MultiUpdater";
-			selfUpdaterJson["inrelease"] = "MultiUpdater.*\.zip";
+			selfUpdaterJson["inrelease"] = "MultiUpdater.*\\.zip";
 			selfUpdaterJson["inarchive"] = "MultiUpdater.cia";
 			selfUpdaterJson["path"] = "/cias/MultiUpdater.cia";
 

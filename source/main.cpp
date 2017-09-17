@@ -2,10 +2,10 @@
 #include "menu.hpp"
 #include "config.hpp"
 
-
 int main()
 {	
 	gfxInitDefault();
+	romfsInit();
 	httpcInit(0);
 	amInit();
 	
@@ -55,6 +55,7 @@ int main()
 	
 	amExit();
 	httpcExit();
+	romfsExit();
 	gfxExit();
 	return 0;
 }
