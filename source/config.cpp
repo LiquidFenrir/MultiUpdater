@@ -34,7 +34,7 @@ void Entry::update(bool deleteArchive, bool deleteCia)
 	//otherwise, download to an archive in the working dir, then extract where wanted
 	else {
 		std::stringstream downloadPathStream;
-		downloadPathStream << WORKING_DIR << name.c_str() << ".archive";
+		downloadPathStream << WORKING_DIR << "/" << name.c_str() << ".archive";
 		downloadPath = downloadPathStream.str();
 	}
 	
