@@ -33,4 +33,4 @@ using json = nlohmann::json;
 #define CONFIG_FILE_NAME  "config.json"
 #define CONFIG_FILE_PATH  WORKING_DIR  "/"  CONFIG_FILE_NAME
 
-#define CONFIG_FILE_URL   "https://raw.githubusercontent.com/LiquidFenrir/MultiUpdater/master/config.json"
+#define CONFIG_FILE_URL   "https://raw.githubusercontent.com/LiquidFenrir/MultiUpdater/rewrite/config.json"

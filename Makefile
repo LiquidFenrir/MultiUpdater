@@ -32,8 +32,7 @@ UNIQUE_ID        :=  0xd5c49
 
 LOGO             :=  $(RESOURCES)/logo.bcma.lz
 
-# VERSION          :=  $(shell git describe --tags)
-VERSION	:= 0.0.0
+VERSION          :=  $(shell git describe --tags)
 
 #---------------------------------------------------------------------------------
 # options for code generation
