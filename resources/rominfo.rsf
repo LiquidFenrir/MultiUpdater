@@ -3,6 +3,9 @@ BasicInfo:
   ProductCode             : $(APP_PRODUCT_CODE)
   Logo                    : Homebrew
 
+RomFs:
+  RootPath: $(APP_ROMFS)
+
 TitleInfo:
   Category                : Application
   UniqueId                : $(APP_UNIQUE_ID)

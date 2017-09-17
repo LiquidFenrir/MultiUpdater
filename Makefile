@@ -9,31 +9,44 @@ endif
 TOPDIR ?= $(CURDIR)
 include $(DEVKITARM)/3ds_rules
 
-APP_TITLE        :=  MultiUpdater
-APP_DESCRIPTION  :=  Updater for FIRM payloads, CIAs, and other files.
-APP_AUTHOR       :=  LiquidFenrir
+# Your values.
+APP_TITLE           :=  MultiUpdater
+APP_DESCRIPTION     :=  Updater for FIRM payloads, CIAs, and other files
+APP_AUTHOR          :=  LiquidFenrir
 
-TARGET           :=  MultiUpdater
-OUTDIR           :=  out
-BUILD            :=  build
-SOURCES          :=  source
-INCLUDES         :=  include
-RESOURCES        :=  $(CURDIR)/resources
 
-ICON             :=  $(RESOURCES)/icon.png
-ICON_FLAGS       :=  visible,nosavebackups
+TARGET              :=  $(subst $e ,_,$(notdir $(APP_TITLE)))
+OUTDIR              :=  out
+BUILD               :=  build
+SOURCES             :=  source
+INCLUDES            :=  include
+ROMFS               :=  romfs
+# DATA                :=  data
 
-BANNER_AUDIO     :=  $(RESOURCES)/audio.wav
-BANNER_IMAGE     :=  $(RESOURCES)/banner.png
 
-RSF_PATH         :=  $(RESOURCES)/rominfo.rsf
-PRODUCT_CODE     :=  CTR-P-ULTI
-UNIQUE_ID        :=  0xd5c49
+# Path to the files
+# If left blank, will try to use "icon.png", "$(TARGET).png", or the default ctrulib icon, in that order
+ICON                :=  resources/icon.png
 
-LOGO             :=  $(RESOURCES)/logo.bcma.lz
+BANNER_AUDIO        :=  resources/audio.wav
+BANNER_IMAGE        :=  resources/banner.png
 
-# VERSION          :=  $(shell git describe --tags)
-VERSION	:= 0.0.0
+RSF_PATH            :=  resources/rominfo.rsf
+
+# If left blank, makerom will use the default Homebrew logo
+LOGO                :=  resources/logo.bcma.lz
+
+
+# If left blank, makerom will use default values (0xff3ff and CTR-P-CTAP, respectively)
+# Be careful if UNIQUE_ID is the same as other apps: it will overwrite the previously installed one
+UNIQUE_ID           :=  0xd5c49
+PRODUCT_CODE        :=  CTR-P-ULTI
+
+# VERSION             :=  $(shell git describe --tags)
+VERSION             :=  v0.0r
+
+# Don't really need to change this
+ICON_FLAGS          :=	nosavebackups,visible
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -41,10 +54,13 @@ VERSION	:= 0.0.0
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
 CFLAGS	:=	-g -Wall -Wextra -O2 -mword-relocations \
-			-fomit-frame-pointer -ffunction-sections \
-			$(ARCH)
+      	  	-ffunction-sections \
+      	  	$(ARCH)
 
-CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS -D_GNU_SOURCE -DAPP_TITLE="\"$(APP_TITLE)\"" -DAPP_AUTHOR="\"$(APP_AUTHOR)\"" -DVERSION_STRING="\"$(VERSION)\""
+CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS -D_GNU_SOURCE \
+      	  	-DAPP_TITLE="\"$(APP_TITLE)\"" \
+      	  	-DAPP_AUTHOR="\"$(APP_AUTHOR)\"" \
+      	  	-DVERSION_STRING="\"$(VERSION)\""
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 
@@ -116,7 +132,7 @@ ifeq ($(strip $(ICON)),)
 		endif
 	endif
 else
-	export APP_ICON := $(ICON)
+	export APP_ICON := $(TOPDIR)/$(ICON)
 endif
 
 ifeq ($(strip $(NO_SMDH)),)
@@ -130,9 +146,9 @@ endif
 .PHONY: $(BUILD) clean all release
 
 #---------------------------------------------------------------------------------
-3dsx: $(BUILD)
+3dsx: $(BUILD) $(OUTPUT).3dsx
 
-cia : $(OUTPUT).cia
+cia  :$(BUILD) $(OUTPUT).cia
 
 all: 3dsx cia
 
@@ -142,7 +158,6 @@ $(BUILD):
 	@mkdir -p $(OUTDIR)
 	@[ -d "$@" ] || mkdir -p "$@"
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
-	@rm -f "$(OUTPUT).smdh"
 
 #---------------------------------------------------------------------------------
 clean:
@@ -155,15 +170,35 @@ clean:
 	@7z rn -bso0 "$@" "$(TARGET).3dsx"  "3ds/$(TARGET)/$(TARGET).3dsx"
 
 #---------------------------------------------------------------------------------
+ifeq ($(strip $(NO_SMDH)),)
+$(OUTPUT).3dsx	:	$(OUTPUT).elf $(OUTPUT).smdh
+else
+$(OUTPUT).3dsx	:	$(OUTPUT).elf
+endif
 
-MAKEROM	?=	makerom
+#---------------------------------------------------------------------------------
+MAKEROM     ?=  makerom
 
-%.cia: $(OUTPUT).elf $(BUILD)/banner.bnr $(BUILD)/icon.icn
-	$(MAKEROM) -f cia -o "$@" -elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -logo "$(LOGO)" -target t -exefslogo -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(UNIQUE_ID)"
+MAKEROM_ARGS	  :=  -elf "$(OUTPUT).elf" \
+	                  -rsf "$(RSF_PATH)" \
+	                  -banner "$(BUILD)/banner.bnr" \
+	                  -icon "$(BUILD)/icon.icn" \
+	                  -DAPP_TITLE="$(APP_TITLE)" \
+	                  -DAPP_PRODUCT_CODE="$(PRODUCT_CODE)" \
+	                  -DAPP_UNIQUE_ID="$(UNIQUE_ID)"
 
-# Banner
+ifneq ($(strip $(ROMFS)),)
+	MAKEROM_ARGS  +=  -DAPP_ROMFS="$(ROMFS)"
+endif
+ifneq ($(strip $(LOGO)),)
+	MAKEROM_ARGS  +=  -logo "$(LOGO)"
+endif
 
-BANNERTOOL	?=	bannertool
+$(OUTPUT).cia:  $(OUTPUT).elf $(BUILD)/banner.bnr $(BUILD)/icon.icn
+	$(MAKEROM) -f cia -o "$@" -target t -exefslogo $(MAKEROM_ARGS)
+
+
+BANNERTOOL  ?=  bannertool
 
 ifeq ($(suffix $(BANNER_IMAGE)),.cgfx)
 	BANNER_IMAGE_ARG := -ci
@@ -177,11 +212,11 @@ else
 	BANNER_AUDIO_ARG := -a
 endif
 
-$(BUILD)/banner.bnr	:	$(BANNER_IMAGE) $(BANNER_AUDIO)
+$(BUILD)/banner.bnr :  $(BANNER_IMAGE) $(BANNER_AUDIO)
 	$(BANNERTOOL) makebanner $(BANNER_IMAGE_ARG) "$(BANNER_IMAGE)" $(BANNER_AUDIO_ARG) "$(BANNER_AUDIO)" -o "$@"
 
-$(BUILD)/icon.icn	:	$(ICON)
-	$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i "$(ICON)" -f "$(ICON_FLAGS)" -o "$@"
+$(BUILD)/icon.icn   :  $(APP_ICON)
+	$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i "$(APP_ICON)" -f "$(ICON_FLAGS)" -o "$@"
 
 
 #---------------------------------------------------------------------------------
@@ -192,11 +227,6 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-ifeq ($(strip $(NO_SMDH)),)
-$(OUTPUT).3dsx	:	$(OUTPUT).elf $(OUTPUT).smdh
-else
-$(OUTPUT).3dsx	:	$(OUTPUT).elf
-endif
 
 $(OUTPUT).elf	:	$(OFILES)
 
