@@ -14,7 +14,7 @@ class Entry
 	public:
 	
 	std::string name;
-	EntryState state;
+	int state;
 	
 	Entry(json jsonEntry);
 	
