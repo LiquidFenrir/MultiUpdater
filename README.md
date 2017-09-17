@@ -17,5 +17,4 @@ MultiUpdater is licensed under the MIT license, a copy of which can be found in 
 
 # Credits
 All of the ctrulib contributors, for ctrulib which this depends upon  
-
 \#Cakey on freenode for help
