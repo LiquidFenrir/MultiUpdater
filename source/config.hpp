@@ -18,7 +18,7 @@ class Entry
 	
 	Entry(json jsonEntry);
 	
-	void update();
+	void update(bool deleteArchive, bool deleteCia);
 	
 	private:
 	

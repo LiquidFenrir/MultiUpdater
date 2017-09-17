@@ -44,7 +44,7 @@ int main()
 			selectedEntry = config.entries.size()-1;
 		}
 		else if (kDown & KEY_A) {
-			config.entries[selectedEntry].update();
+			config.entries[selectedEntry].update(config.m_deleteArchive, config.m_deleteCIA);
 		}
 		
 		gfxFlushBuffers();

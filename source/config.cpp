@@ -22,7 +22,7 @@ Entry::Entry(json jsonEntry)
 		name = jsonEntry["name"];
 }
 
-void Entry::update()
+void Entry::update(bool deleteArchive, bool deleteCia)
 {
 	printf("\x1b[40;34mUpdating %s...\x1b[0m\n", name.c_str());
 	std::string downloadPath;
@@ -56,6 +56,10 @@ void Entry::update()
 	if (!(m_inArchive.empty())) {
 		printf("\n\x1b[40;34mExtracting file from the archive...\x1b[0m\n");
 		ret = extractArchive(downloadPath, m_inArchive, m_path);
+		
+		if (deleteArchive)
+			deleteFile(downloadPath.c_str());
+		
 		if (ret != 0) {
 			printf("\x1b[40;31mExtraction failed!");
 			goto failure;
@@ -67,12 +71,15 @@ void Entry::update()
 	if (matchPattern(".*(\\.cia)$", m_path)) {
 		printf("\n\x1b[40;34mInstalling CIA...\x1b[0m\n");
 		ret = installCia(m_path.c_str());
-		if (R_FAILED(ret)) {
-			printf("\x1b[40;31mExtraction failed!");
+		if (deleteCia)
+			deleteFile(m_path.c_str());
+		
+		if (ret != 0) {
+			printf("\x1b[40;31mInstall failed!");
 			goto failure;
 		}
 		else
-			printf("\x1b[40;32mExtraction successful!");
+			printf("\x1b[40;32mInstall successful!");
 	}
 	
 	printf("\n\x1b[40;32mUpdate complete!\x1b[0m\n");
@@ -91,7 +98,7 @@ Config::Config()
 	m_selfUpdater = true;
 	m_deleteCIA = false;
 	m_deleteArchive = true;
-
+	
 	Handle configHandle;
 	char* configString = nullptr;
 	Result ret = openFile(&configHandle, CONFIG_FILE_PATH, false);
