@@ -2,8 +2,13 @@
 #include "menu.hpp"
 #include "config.hpp"
 
-int main()
+char * arg0 = NULL;
+
+int main(int argc, char ** argv)
 {
+	if (argc > 0)
+		arg0 = argv[0];
+	
 	gfxInitDefault();
 	httpcInit(0);
 	amInit();

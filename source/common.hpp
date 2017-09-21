@@ -28,7 +28,12 @@ using json = nlohmann::json;
 
 #endif
 
+extern char * arg0;
+
 #define WORKING_DIR       "/3ds/"  APP_TITLE
+
+#define HBL_FILE_NAME     APP_TITLE  ".3dsx"
+#define HBL_FILE_PATH     WORKING_DIR  "/"  HBL_FILE_NAME
 
 #define CONFIG_FILE_NAME  "config.json"
 #define CONFIG_FILE_PATH  WORKING_DIR  "/"  CONFIG_FILE_NAME

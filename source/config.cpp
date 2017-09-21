@@ -132,11 +132,22 @@ Config::Config()
 
 		if (m_selfUpdater) {
 			json selfUpdaterJson;
-			selfUpdaterJson["name"] = "MultiUpdater";
 			selfUpdaterJson["url"] = "https://github.com/LiquidFenrir/MultiUpdater";
 			selfUpdaterJson["inrelease"] = "MultiUpdater.*\\.zip";
-			selfUpdaterJson["inarchive"] = "MultiUpdater.cia";
-			selfUpdaterJson["path"] = "/cias/MultiUpdater.cia";
+			
+			if (envIsHomebrew()) {
+				selfUpdaterJson["name"] = "MultiUpdater (3dsx)";
+				selfUpdaterJson["inarchive"] = (char*)HBL_FILE_PATH+1;
+				if (arg0 == NULL || arg0[0] == '3') //bug, or 3dslink
+					selfUpdaterJson["path"] = HBL_FILE_PATH;
+				else
+					selfUpdaterJson["path"] = arg0;
+			}
+			else {
+				selfUpdaterJson["name"] = "MultiUpdater";
+				selfUpdaterJson["inarchive"] = "MultiUpdater.cia";
+				selfUpdaterJson["path"] = "/cias/MultiUpdater.cia";
+			}
 
 			Entry selfUpdateEntry(selfUpdaterJson);
 			entries.push_back(selfUpdateEntry);
