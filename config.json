@@ -1,6 +1,6 @@
 {
 	"config": {
-		"self_updater": false,
+		"self_updater": true,
 		"delete_archives": true,
 		"delete_cias": false
 	},

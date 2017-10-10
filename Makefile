@@ -33,6 +33,13 @@ UNIQUE_ID        :=  0xd5c49
 LOGO             :=  $(RESOURCES)/logo.bcma.lz
 
 VERSION          :=  $(shell git describe --tags)
+VERSION_MAJOR    :=  $(shell echo $(VERSION) | cut -c2- | cut -f1 -d- | cut -f1 -d.)
+VERSION_MINOR    :=  $(shell echo $(VERSION) | cut -c2- | cut -f1 -d- | cut -f2 -d.)
+VERSION_BUILD    :=  $(shell echo $(VERSION) | cut -c2- | cut -f1 -d- | cut -f3 -d.)
+
+ifeq ($(strip $(VERSION_BUILD)),)
+	VERSION_BUILD := 0
+endif
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -158,7 +165,7 @@ clean:
 MAKEROM	?=	makerom
 
 %.cia: $(OUTPUT).elf $(BUILD)/banner.bnr $(BUILD)/icon.icn
-	$(MAKEROM) -f cia -o "$@" -elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -logo "$(LOGO)" -target t -exefslogo -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(UNIQUE_ID)"
+	$(MAKEROM) -f cia -o "$@" -elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -logo "$(LOGO)" -target t -exefslogo -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(UNIQUE_ID)" -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_BUILD)
 
 # Banner
 
