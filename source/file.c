@@ -82,8 +82,14 @@ Result openFile(Handle* fileHandle, const char * path, bool write)
 
 Result deleteFile(const char * path)
 {
-	FS_ArchiveID archive;
-	FS_Path filePath = getPathInfo(path, &archive);
+	FS_ArchiveID archiveID;
+	FS_Path filePath = getPathInfo(path, &archiveID);
 	
-	return FSUSER_DeleteFile(archive, filePath);
+	FS_Archive archive;
+	Result ret = FSUSER_OpenArchive(&archive, archiveID, fsMakePath(PATH_EMPTY, ""));
+	if (R_FAILED(ret)) return ret;
+	ret = FSUSER_DeleteFile(archive, filePath);
+	FSUSER_CloseArchive(archive);
+	
+	return ret;
 }
