@@ -1,6 +1,6 @@
 {
 	"config": {
-		"self_updater": true,
+		"self_updater": false,
 		"delete_archives": true,
 		"delete_cias": false
 	},
@@ -9,40 +9,39 @@
 			"name": "Anemone3DS",
 			"url": "https://github.com/astronautlevel2/Anemone3DS",
 			"inrelease": "Anemone3DS\\.cia",
-			"path": "/cias/Anemone3DS.cia"
-		},
-		{
-			"name": "3DSident",
-			"url": "https://github.com/joel16/3DSident",
-			"inrelease": "3DSident_GUI\\.cia",
-			"path": "/cias/3DSident_GUI.cia"
+			"path": "/cias/Anemone3DS.cia",
+			"hide": false
 		},
 		{
 			"name": "GodMode9 (latest release)",
 			"url": "https://github.com/d0k3/GodMode9",
 			"inrelease": "GodMode9.*\\.zip",
 			"inarchive": "GodMode9\\.firm",
-			"path": "/luma/payloads/GodMode9.firm"
+			"path": "/luma/payloads/GodMode9.firm",
+			"hide": true
 		},
 		{
 			"name": "Luma3DS (latest commit)",
 			"url": "https://astronautlevel2.github.io/Luma3DS/latest.zip",
 			"inarchive": "out/boot\\.firm",
-			"path": "/boot.firm"
+			"path": "/boot.firm",
+			"hide": true
 		},
 		{
 			"name": "Luma3DS (latest release)",
 			"url": "https://github.com/AuroraWright/Luma3DS",
 			"inrelease": "Luma3DS.*\\.7z",
 			"inarchive": "boot\\.firm",
-			"path": "/boot.firm"
+			"path": "/boot.firm",
+			"hide": true
 		},
 		{
 			"name": "CTRNAND Luma3DS (latest release)",
 			"url": "https://github.com/AuroraWright/Luma3DS",
 			"inrelease": "Luma3DS.*\\.7z",
 			"inarchive": "boot\\.firm",
-			"path": "ctrnand:/boot.firm"
+			"path": "ctrnand:/boot.firm",
+			"hide": false
 		}
 	]
 }
