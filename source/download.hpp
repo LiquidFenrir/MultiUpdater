@@ -10,5 +10,5 @@ enum DownloadError {
 	DL_ERROR_GIT,
 };
 
-Result downloadToFile(std::string url, std::string path, bool gitapi);
+Result downloadToFile(std::string url, std::string path);
 Result downloadFromRelease(std::string url, std::string asset, std::string path);
