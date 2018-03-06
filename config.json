@@ -14,8 +14,14 @@
 		{
 			"name": "3DSident",
 			"url": "https://github.com/joel16/3DSident",
-			"inrelease": "3DSident_GUI\\.cia",
-			"path": "/cias/3DSident_GUI.cia"
+			"inrelease": "3DSident-GUI\\.cia",
+			"path": "/cias/3DSident-GUI.cia"
+		},
+		{
+			"name": "Checkpoint",
+			"url": "https://github.com/BernardoGiordano/Checkpoint",
+			"inrelease": "Checkpoint\\.cia",
+			"path": "/cias/Checkpoint.cia"
 		},
 		{
 			"name": "GodMode9 (latest release)",
