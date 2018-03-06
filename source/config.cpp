@@ -42,7 +42,7 @@ void Entry::update(bool deleteArchive, bool deleteCia)
 	
 	//if the entry doesnt want anything from a release, expect it to be a normal file
 	if (m_inRelease.empty())
-		ret = downloadToFile(m_url, downloadPath, false);
+		ret = downloadToFile(m_url, downloadPath);
 	else
 		ret = downloadFromRelease(m_url, m_inRelease, downloadPath);
 	

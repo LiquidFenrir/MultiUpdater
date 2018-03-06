@@ -1,131 +1,98 @@
 #include "download.hpp"
 
-#include "certs/digicert.h"
-#include "certs/cybertrust.h"
-
 #define  USER_AGENT   APP_TITLE "-" VERSION_STRING
 
-static Result setupContext(httpcContext * context, const char * url, u32 * size, bool gitapi)
+static char* result_buf = NULL;
+static size_t result_sz = 0;
+static size_t result_written = 0;
+
+// following function is from 
+// https://github.com/angelsl/libctrfgh/blob/master/curl_test/src/main.c
+static size_t handle_data(char* ptr, size_t size, size_t nmemb, void* userdata)
 {
-	Result ret = 0;
-	u32 statuscode = 0;
-	
-	ret = httpcOpenContext(context, HTTPC_METHOD_GET, url, 1);
-	if (R_FAILED(ret)) {
-		printf("Error in:\nhttpcOpenContext\n");
-		httpcCloseContext(context);
-		return ret;
-	}
-	
-	ret = httpcAddRequestHeaderField(context, "User-Agent", USER_AGENT);
-	if (R_FAILED(ret)) {
-		printf("Error in:\nhttpcAddRequestHeaderField\n");
-		httpcCloseContext(context);
-		return ret;
-	}
-	
-	if (gitapi) {
-		ret = httpcAddTrustedRootCA(context, cybertrust_cer, cybertrust_cer_len);
-		if (R_FAILED(ret)) {
-			printf("Error in:\nhttpcAddRequestHeaderField\n");
-			httpcCloseContext(context);
-			return ret;
-		}
-		
-		ret = httpcAddTrustedRootCA(context, digicert_cer, digicert_cer_len);
-		if (R_FAILED(ret)) {
-			printf("Error in:\nhttpcAddRequestHeaderField\n");
-			httpcCloseContext(context);
-			return ret;
-		}
-	}
-	else {
-		ret = httpcSetSSLOpt(context, SSLCOPT_DisableVerify);
-		if (R_FAILED(ret)) {
-			printf("Error in:\nhttpcSetSSLOpt\n");
-			httpcCloseContext(context);
-			return ret;
-		}
-	}
-	
-	ret = httpcAddRequestHeaderField(context, "Connection", "Keep-Alive");
-	if (R_FAILED(ret)) {
-		printf("Error in:\nhttpcAddRequestHeaderField\n");
-		httpcCloseContext(context);
-		return ret;
-	}
-	
-	ret = httpcBeginRequest(context);
-	if (R_FAILED(ret)) {
-		printf("Error in:\nhttpcBeginRequest\n");
-		httpcCloseContext(context);
-		return ret;
-	}
-	
-	ret = httpcGetResponseStatusCode(context, &statuscode);
-	if (R_FAILED(ret)) {
-		printf("Error in:\nhttpcGetResponseStatusCode\n");
-		httpcCloseContext(context);
-		return ret;
-	}
-	
-	if ((statuscode >= 301 && statuscode <= 303) || (statuscode >= 307 && statuscode <= 308)) {
-		char* newurl = (char*)malloc(0x1000); // One 4K page for new URL
-		if (newurl == NULL) {
-			httpcCloseContext(context);
-			return DL_ERROR_ALLOC;
-		}
-		
-		ret = httpcGetResponseHeader(context, "Location", newurl, 0x1000);
-		if (R_FAILED(ret)) {
-			printf("Error in:\nhttpcGetResponseHeader\n");
-			httpcCloseContext(context);
-			free(newurl);
-			return ret;
-		}
-		
-		httpcCloseContext(context); // Close this context before we try the next
-		
-		if (gitapi)
-			printf("Redirecting...\n");
-		else
-			printf("Redirecting to url:\n%s\n", newurl);
-		
-		ret = setupContext(context, newurl, size, gitapi);
-		free(newurl);
-		return ret;
-	}
-	
-	if (statuscode != 200) {
-		printf("Error: HTTP status code is not 200 OK.\nStatus code: %lu\n", statuscode);
-		httpcCloseContext(context);
-		return DL_ERROR_STATUSCODE;
-	}
-	
-	ret = httpcGetDownloadSizeState(context, NULL, size);
-	if (R_FAILED(ret)) {
-		printf("Error in:\nhttpcGetDownloadSizeState\n");
-		httpcCloseContext(context);
-		return ret;
-	}
-	
-	return 0;
+    (void) userdata;
+    const size_t bsz = size*nmemb;
+
+    if (result_sz == 0 || !result_buf)
+    {
+        result_sz = 0x1000;
+        result_buf = (char*)malloc(result_sz);
+    }
+
+    bool need_realloc = false;
+    while (result_written + bsz > result_sz) 
+    {
+        result_sz <<= 1;
+        need_realloc = true;
+    }
+
+    if (need_realloc)
+    {
+        char *new_buf = (char*)realloc(result_buf, result_sz);
+        if (!new_buf)
+        {
+            return 0;
+        }
+        result_buf = new_buf;
+    }
+
+    if (!result_buf)
+    {
+        return 0;
+    }
+
+    memcpy(result_buf + result_written, ptr, bsz);
+    result_written += bsz;
+    return bsz;
 }
 
-Result downloadToFile(std::string url, std::string path, bool gitapi)
+static Result setupContext(CURL *hnd, const char * url)
 {
+    curl_easy_setopt(hnd, CURLOPT_BUFFERSIZE, 102400L);
+    curl_easy_setopt(hnd, CURLOPT_URL, url);
+    curl_easy_setopt(hnd, CURLOPT_NOPROGRESS, 1L);
+    curl_easy_setopt(hnd, CURLOPT_USERAGENT, USER_AGENT);
+    curl_easy_setopt(hnd, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(hnd, CURLOPT_MAXREDIRS, 50L);
+    curl_easy_setopt(hnd, CURLOPT_HTTP_VERSION, (long)CURL_HTTP_VERSION_2TLS);
+    curl_easy_setopt(hnd, CURLOPT_WRITEFUNCTION, handle_data);
+    curl_easy_setopt(hnd, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(hnd, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(hnd, CURLOPT_STDERR, stdout);
+
+    return 0;
+}
+
+Result downloadToFile(std::string url, std::string path)
+{
+	Result ret = 0;	
 	printf("Downloading from:\n%s\nto:\n%s\n", url.c_str(), path.c_str());
-	
-	httpcContext context;
-	Result ret = 0;
-	u32 contentsize = 0, readsize = 0;
-	
-	ret = setupContext(&context, url.c_str(), &contentsize, gitapi);
-	if (ret != 0)
+
+    void *socubuf = memalign(0x1000, 0x100000);
+    if (!socubuf)
+    {
+        return -1;
+    }
+
+	ret = socInit((u32*)socubuf, 0x100000);
+	if (R_FAILED(ret))
+    {
+		free(socubuf);
+        return ret;
+    }
+
+	CURL *hnd = curl_easy_init();
+	ret = setupContext(hnd, url.c_str());
+	if (ret != 0) {
+		socExit();
+		free(result_buf);
+		free(socubuf);
+		result_buf = NULL;
+		result_sz = 0;
+		result_written = 0;
 		return ret;
-	
-	printf("Downloading %lu bytes...\n", contentsize);
-	
+	}
+
 	Handle fileHandle;
 	u64 offset = 0;
 	u32 bytesWritten = 0;
@@ -133,40 +100,63 @@ Result downloadToFile(std::string url, std::string path, bool gitapi)
 	ret = openFile(&fileHandle, path.c_str(), true);
 	if (R_FAILED(ret)) {
 		printf("Error: couldn't open file to write.\n");
-		httpcCloseContext(&context);
+		socExit();
+		free(result_buf);
+		free(socubuf);
+		result_buf = NULL;
+		result_sz = 0;
+		result_written = 0;
 		return DL_ERROR_WRITEFILE;
 	}
 	
-	u8* buf = (u8*)malloc(0x1000);
-	if (buf == NULL) {
-		httpcCloseContext(&context);
-		return DL_ERROR_ALLOC;
+	u64 startTime = osGetTime();
+
+	CURLcode cres = curl_easy_perform(hnd);
+    curl_easy_cleanup(hnd);
+
+	if (cres != CURLE_OK) {
+		printf("Error in:\ncurl\n");
+		socExit();
+		free(result_buf);
+		free(socubuf);
+		result_buf = NULL;
+		result_sz = 0;
+		result_written = 0;
+		return -1;
 	}
 	
-	u64 startTime = osGetTime();
-	do {
-		ret = httpcDownloadData(&context, buf, 0x1000, &readsize);
-		FSFILE_Write(fileHandle, &bytesWritten, offset, buf, readsize, 0);
-		offset += readsize;
-	} while (ret == (Result)HTTPC_RESULTCODE_DOWNLOADPENDING);
+	FSFILE_Write(fileHandle, &bytesWritten, offset, result_buf, result_written, 0);
+
 	u64 endTime = osGetTime();
 	u64 totalTime = endTime - startTime;
 	printf("Download took %llu milliseconds.\n", totalTime);
-	
-	free(buf);
+
+    socExit();
+    free(result_buf);
+    free(socubuf);
+	result_buf = NULL;
+	result_sz = 0;
+	result_written = 0;
 	FSFILE_Close(fileHandle);
-	httpcCloseContext(&context);
-	
-	if (R_FAILED(ret)) {
-		printf("Error in:\nhttpcDownloadData\n");
-		return ret;
-	}
-	
 	return 0;
 }
 
 Result downloadFromRelease(std::string url, std::string asset, std::string path)
 {
+	Result ret = 0;
+    void *socubuf = memalign(0x1000, 0x100000);
+    if (!socubuf)
+    {
+        return -1;
+    }
+
+	ret = socInit((u32*)socubuf, 0x100000);
+	if (R_FAILED(ret))
+    {
+		free(socubuf);
+        return ret;
+    }
+
 	std::regex parseUrl("github\\.com\\/(.+)\\/(.+)");
 	std::smatch result;
 	regex_search(url, result, parseUrl);
@@ -180,35 +170,38 @@ Result downloadFromRelease(std::string url, std::string asset, std::string path)
 	printf("Downloading latest release from repo:\n%s\nby:\n%s\n", repoName.c_str(), repoOwner.c_str());
 	printf("Crafted API url:\n%s\n", apiurl.c_str());
 	
-	httpcContext context;
-	Result ret = 0;
-	u32 contentsize = 0, readsize = 0;
-	
-	ret = setupContext(&context, apiurl.c_str(), &contentsize, true);
-	if (ret != 0)
+	CURL *hnd = curl_easy_init();
+	ret = setupContext(hnd, apiurl.c_str());
+	if (ret != 0) {
+		socExit();
+		free(result_buf);
+		free(socubuf);
+		result_buf = NULL;
+		result_sz = 0;
+		result_written = 0;
 		return ret;
-	
-	char * buf = (char*)malloc(contentsize+1);
-	if (buf == NULL) {
-		httpcCloseContext(&context);
-		return DL_ERROR_ALLOC;
 	}
-	buf[contentsize] = 0; //nullbyte to end it as a proper C style string
+
+	CURLcode cres = curl_easy_perform(hnd);
+    curl_easy_cleanup(hnd);
+	char* newbuf = (char*)realloc(result_buf, result_written + 1);
+	result_buf = newbuf;
+	result_buf[result_written] = 0; //nullbyte to end it as a proper C style string
 	
-	do {
-		ret = httpcDownloadData(&context, (u8 *)buf, contentsize, &readsize);
-	} while (ret == (Result)HTTPC_RESULTCODE_DOWNLOADPENDING);
-	
-	httpcCloseContext(&context);
-	if (R_FAILED(ret)) {
-		printf("Error in:\nhttpcDownloadData\n");
-		free(buf);
-		return ret;
+	if (cres != CURLE_OK) {
+		printf("Error in:\ncurl\n");
+		socExit();
+		free(result_buf);
+		free(socubuf);
+		result_buf = NULL;
+		result_sz = 0;
+		result_written = 0;
+		return -1;
 	}
 	
 	printf("Looking for asset with name matching:\n%s\n", asset.c_str());
 	std::string assetUrl;
-	json parsedAPI = json::parse(buf);
+	json parsedAPI = json::parse(result_buf);
 	if (parsedAPI["assets"].is_array()) {
 		for (auto jsonAsset : parsedAPI["assets"]) {
 			if (jsonAsset.is_object() && jsonAsset["name"].is_string() && jsonAsset["browser_download_url"].is_string()) {
@@ -220,12 +213,17 @@ Result downloadFromRelease(std::string url, std::string asset, std::string path)
 			}
 		}
 	}
-	free(buf);
+    socExit();
+    free(result_buf);
+    free(socubuf);
+	result_buf = NULL;
+	result_sz = 0;
+	result_written = 0;
 	
 	if (assetUrl.empty())
 		ret = DL_ERROR_GIT;
 	else
-		ret = downloadToFile(assetUrl, path, true);
+		ret = downloadToFile(assetUrl, path);
 	
 	return ret;
 }

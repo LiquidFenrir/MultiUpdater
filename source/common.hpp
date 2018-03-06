@@ -5,6 +5,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,6 +21,7 @@ extern "C" {
 #include <string>
 #include <vector>
 #include <regex>
+#include <curl/curl.h>
 
 #include "stringutils.hpp"
 #include "json.hpp"
