@@ -20,14 +20,15 @@ Result extractArchive(std::string archivePath, std::string wantedFile, std::stri
 	Result ret = EXTRACT_ERROR_FIND;
 	while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
 		std::string entryName(archive_entry_pathname(entry));
-		if (matchPattern(wantedFile, entryName.substr(0,wantedFile.length()))) {
+		if (wantedFile == "/")	wantedFile = "";
+		if (matchPattern(wantedFile, entryName.substr(0,wantedFile.length())) || wantedFile == "") {
 			ret = EXTRACT_ERROR_NONE;
 
 			Handle fileHandle;
 			std::string outputPathFinal = outputPath + entryName.substr(wantedFile.length());
 			if (outputPathFinal.substr(outputPathFinal.length()-1) == "/")	continue;
+			printf("Extracting \"%s\"...\n", outputPathFinal.c_str());
 			Result res = openFile(&fileHandle, outputPathFinal.c_str(), true);
-			printf("Extracting %s...\n", outputPathFinal.c_str());
 			if (R_FAILED(res)) {
 				ret = EXTRACT_ERROR_OPENFILE;
 				break;
