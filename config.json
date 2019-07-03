@@ -39,14 +39,14 @@
 		{
 			"name": "Luma3DS (latest release)",
 			"url": "https://github.com/AuroraWright/Luma3DS",
-			"inrelease": "Luma3DS.*\\.7z",
+			"inrelease": "Luma3DS.*\\.zip",
 			"inarchive": "boot\\.firm",
 			"path": "/boot.firm"
 		},
 		{
 			"name": "CTRNAND Luma3DS (latest release)",
 			"url": "https://github.com/AuroraWright/Luma3DS",
-			"inrelease": "Luma3DS.*\\.7z",
+			"inrelease": "Luma3DS.*\\.zip",
 			"inarchive": "boot\\.firm",
 			"path": "ctrnand:/boot.firm"
 		}
