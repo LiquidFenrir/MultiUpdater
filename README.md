@@ -1,3 +1,6 @@
+# Archived project
+This will not be worked on anymore.
+
 # MultiUpdater
 MultiUpdater is an updater for FIRM payloads, CIA applications, and other files on the SD card.
 
